@@ -3,6 +3,10 @@ import { useAuth } from './AuthContext';
 import ProtectedRoute from './ProtectedRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import UserDashboard from './pages/UserDashboard';
+import AgentDashboard from './pages/AgentDashboard';
+import RecyclerDashboard from './pages/RecyclerDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 
 function Home() {
   const { user, logout } = useAuth();
@@ -16,6 +20,20 @@ function Home() {
             Logged in as <strong>{user.name}</strong> ({user.role})
           </p>
           <button onClick={logout}>Logout</button>
+          <div style={{ marginTop: '1rem' }}>
+            {user.role === 'user' && (
+              <Link to="/user/dashboard">Go to User Dashboard</Link>
+            )}
+            {user.role === 'agent' && (
+              <Link to="/agent/dashboard">Go to Agent Dashboard</Link>
+            )}
+            {user.role === 'recycler' && (
+              <Link to="/recycler/dashboard">Go to Recycler Dashboard</Link>
+            )}
+            {user.role === 'admin' && (
+              <Link to="/admin/dashboard">Go to Admin Dashboard</Link>
+            )}
+          </div>
         </>
       ) : (
         <p>
@@ -43,7 +61,7 @@ function App() {
         path="/user/dashboard"
         element={
           <ProtectedRoute allowedRoles={['user']}>
-            <div>User dashboard (to be implemented)</div>
+            <UserDashboard />
           </ProtectedRoute>
         }
       />
@@ -51,7 +69,7 @@ function App() {
         path="/agent/dashboard"
         element={
           <ProtectedRoute allowedRoles={['agent']}>
-            <div>Agent dashboard (to be implemented)</div>
+            <AgentDashboard />
           </ProtectedRoute>
         }
       />
@@ -59,7 +77,7 @@ function App() {
         path="/recycler/dashboard"
         element={
           <ProtectedRoute allowedRoles={['recycler']}>
-            <div>Recycler dashboard (to be implemented)</div>
+            <RecyclerDashboard />
           </ProtectedRoute>
         }
       />
@@ -67,7 +85,7 @@ function App() {
         path="/admin/dashboard"
         element={
           <ProtectedRoute allowedRoles={['admin']}>
-            <div>Admin dashboard (to be implemented)</div>
+            <AdminDashboard />
           </ProtectedRoute>
         }
       />

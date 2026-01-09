@@ -7,12 +7,14 @@ const pickupRequestSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    // For simplicity, store item description + quantity directly in the request.
+    // This avoids needing a separate item selection UI for the demo.
     items: [
       {
-        itemId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'EWasteItem',
+        description: {
+          type: String,
           required: true,
+          trim: true,
         },
         quantity: {
           type: Number,
