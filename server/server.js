@@ -16,6 +16,10 @@ connectDB();
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/pickup', require('./routes/pickup'));
+app.use('/api/agent', require('./routes/agent'));
+app.use('/api/recycler', require('./routes/recycler'));
+app.use('/api/admin', require('./routes/admin'));
 
 // Test route
 app.get('/', (req, res) => {
