@@ -1,0 +1,119 @@
+E-Waste Collection and Recycling Management System – Example
+------------------------------------------------------------
+1. PROJECT OVERVIEW
+----------------------
+Project Title: E-Waste Collection and Recycling Management System
+Tech Stack: MERN (MongoDB, Express, React, Node.js)
+-----------------------------------------------------------
+2. PROBLEM STATEMENT
+------------------------------
+Improper disposal of electronic waste leads to environmental pollution and health hazards.
+People do not know where or how to dispose of e-waste responsibly.
+Manual collection methods lack tracking, transparency, and coordination between users, collection agents, and recyclers.
+------------------------------------------------
+3. PROPOSED SOLUTION
+----------------------------
+A centralized web application that connects Users, Collection Agents, Recyclers, and Admin.
+Users can request e-waste pickup from their location.
+Collection Agents receive pickup requests and collect e-waste.
+Recyclers process the collected e-waste responsibly.
+Admin monitors the entire workflow.
+Each request moves through clear status updates:
+Requested → Collected → Sent to Recycler → Recycled
+------------------------------
+4. USER ROLES & PERMISSIONS
+------------------------------
+A. User (Citizen):
+Can Register and Login.
+Can Create an E-Waste Pickup Request.
+Can Specify E-Waste Type (Mobile, Laptop, TV, etc.).
+Can Track Request Status.
+Can View Pickup History.
+---------------------------
+B. Collection Agent:
+---------------------------------
+Can Login.
+Can View Assigned Pickup Requests.
+Can Update Pickup Status (Pending → Collected).
+Can Hand over collected items to Recycler
+-----------------------------
+C. Recycler:
+------------------------
+Can Login.
+Can View Incoming E-Waste from Agents.
+Can Update Recycling Status (Received → Recycled).
+Can Add Recycling Notes
+-----------------------
+D. Admin:
+-----------------
+Can Login (Secure Admin Dashboard).
+Can Manage Users, Agents, and Recyclers.
+Can Assign Pickup Requests to Agents.
+Can Monitor Entire System Flow.
+Can View Reports & Statistics.
+---------------------------------
+5. DATABASE STRUCTURE (Schemas)
+----------------------------
+A. User Schema:
+Name (String)
+Email (String, Unique)
+Password (Hashed)
+Role (String: user, agent, recycler, admin)
+Address (String)
+Phone (String)
+-----------------------------
+B. E-Waste Item Schema:
+ItemType (String, e.g., "Laptop", "Mobile Phone")
+Description (String)
+EstimatedWeight (Number)
+Category (String, e.g., "Small Electronics", "Large Appliances")
+IsHazardous (Boolean)
+-------------------------------
+C. Pickup Request Schema:
+UserID (Reference to User)
+Items (Array of Objects: { ItemID, Quantity })
+PickupAddress (String)
+AssignedAgentID (Reference to Collection Agent)
+Status (String: Requested, Collected, SentToRecycler, Recycled)
+CreatedAt (Timestamp)
+-----------------------------
+D. Recycling Record Schema:
+PickupRequestID (Reference)
+RecyclerID (Reference)
+RecyclingMethod (String)
+CompletionDate (Timestamp)
+Remarks (String)
+---------------------------
+6. FEATURE WORKFLOW (User Journey)
+-----------------------------------
+Login: User logs into the system.
+Request: User submits an e-waste pickup request.
+Database: A new pickup request is created with status Requested.
+Admin View: Admin assigns the request to a Collection Agent.
+Collection: Agent collects the e-waste and updates status to Collected.
+Recycler: E-waste is sent to Recycler.
+Completion: Recycler marks it as Recycled.
+Feedback: User sees the final status update.
+-----------------------------------
+7. API ENDPOINTS (URL RULES)
+----------------------------------
+Authentication
+POST /api/auth/register → Register user/agent/recycler
+POST /api/auth/login → Login
+
+User (Citizen)
+POST /api/pickup/request → Create pickup request
+GET /api/pickup/my-requests → View user requests
+
+Collection Agent
+GET /api/agent/requests → View assigned requests
+PUT /api/agent/collect/:id → Mark as collected
+
+Recycler
+GET /api/recycler/requests → View incoming e-waste
+PUT /api/recycler/recycle/:id → Mark as recycled
+
+Admin
+GET /api/admin/requests → View all requests
+PUT /api/admin/assign/:id → Assign agent
+GET /api/admin/reports → System analytics
