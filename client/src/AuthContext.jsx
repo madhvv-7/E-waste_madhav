@@ -39,7 +39,15 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (values) => {
     const res = await api.post('/auth/register', values);
+    
+    // If account is pending approval, return without login (no token)
+    if (res.data.pending) {
+      return res.data; // Return the response for the component to handle
+    }
+    
+    // Active account (user role): login immediately
     login(res.data);
+    return res.data;
   };
 
   const loginRequest = async (values) => {

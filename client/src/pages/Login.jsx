@@ -28,43 +28,43 @@ function Login() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: '2rem auto' }}>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '1rem' }}>
-          <label>
-            Email
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              style={{ width: '100%', padding: '0.5rem' }}
-            />
-          </label>
-        </div>
-        <div style={{ marginBottom: '1rem' }}>
-          <label>
-            Password
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              style={{ width: '100%', padding: '0.5rem' }}
-            />
-          </label>
-        </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
-      <p style={{ marginTop: '1rem' }}>
-        No account? <Link to="/register">Register</Link>
-      </p>
+    <div className="container">
+      <div className="card" style={{ maxWidth: 400, margin: '2rem auto' }}>
+        <h2>Login</h2>
+        {error && <div className="message message-error">{error}</div>}
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>
+              Email
+              <input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                required
+              />
+            </label>
+          </div>
+          <div className="form-group">
+            <label>
+              Password
+              <input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                required
+              />
+            </label>
+          </div>
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
+        <p style={{ marginTop: '1rem', textAlign: 'center' }}>
+          No account? <Link to="/register">Register</Link>
+        </p>
+      </div>
     </div>
   );
 }

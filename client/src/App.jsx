@@ -1,6 +1,7 @@
 import { Link, Route, Routes } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import ProtectedRoute from './ProtectedRoute';
+import Navbar from './components/Navbar';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import UserDashboard from './pages/UserDashboard';
@@ -9,87 +10,89 @@ import RecyclerDashboard from './pages/RecyclerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 
 function Home() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   return (
-    <div style={{ padding: '1.5rem' }}>
-      <h1>E-Waste Collection & Recycling</h1>
+    <div className="home-container">
+      <h1>E-Waste Collection & Recycling Management System</h1>
       {user ? (
         <>
           <p>
-            Logged in as <strong>{user.name}</strong> ({user.role})
+            Welcome, <strong>{user.name}</strong>! Access your dashboard below.
           </p>
-          <button onClick={logout}>Logout</button>
-          <div style={{ marginTop: '1rem' }}>
+          <div className="dashboard-links">
             {user.role === 'user' && (
-              <Link to="/user/dashboard">Go to User Dashboard</Link>
+              <Link to="/user/dashboard">User Dashboard</Link>
             )}
             {user.role === 'agent' && (
-              <Link to="/agent/dashboard">Go to Agent Dashboard</Link>
+              <Link to="/agent/dashboard">Agent Dashboard</Link>
             )}
             {user.role === 'recycler' && (
-              <Link to="/recycler/dashboard">Go to Recycler Dashboard</Link>
+              <Link to="/recycler/dashboard">Recycler Dashboard</Link>
             )}
             {user.role === 'admin' && (
-              <Link to="/admin/dashboard">Go to Admin Dashboard</Link>
+              <Link to="/admin/dashboard">Admin Dashboard</Link>
             )}
           </div>
         </>
       ) : (
-        <p>
-          <Link to="/login">Login</Link> or{' '}
-          <Link to="/register">Register</Link> to continue.
-        </p>
+        <>
+          <p>
+            A centralized web application connecting Users, Collection Agents,
+            Recyclers, and Admin for responsible e-waste management.
+          </p>
+          <div className="dashboard-links">
+            <Link to="/login">Login</Link>
+            <Link to="/register">Register</Link>
+          </div>
+        </>
       )}
-      <p style={{ marginTop: '1rem' }}>
-        This is the main landing page. In later phases we will add separate
-        dashboards for User, Agent, Recycler, and Admin.
-      </p>
     </div>
   );
 }
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-
-      {/* Examples of protected routes we will fill in future phases */}
-      <Route
-        path="/user/dashboard"
-        element={
-          <ProtectedRoute allowedRoles={['user']}>
-            <UserDashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/agent/dashboard"
-        element={
-          <ProtectedRoute allowedRoles={['agent']}>
-            <AgentDashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/recycler/dashboard"
-        element={
-          <ProtectedRoute allowedRoles={['recycler']}>
-            <RecyclerDashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/dashboard"
-        element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <AdminDashboard />
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/user/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['user']}>
+              <UserDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/agent/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['agent']}>
+              <AgentDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/recycler/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['recycler']}>
+              <RecyclerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </>
   );
 }
 

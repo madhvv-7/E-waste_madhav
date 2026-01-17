@@ -7,14 +7,19 @@ function UserDashboard() {
   const [quantity, setQuantity] = useState(1);
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(true);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const fetchRequests = async () => {
     try {
+      setFetchLoading(true);
       const res = await api.get('/pickup/my-requests');
       setRequests(res.data);
-    } catch {
-      // Keep it simple for now
+    } catch (err) {
+      setError(err.response?.data?.message || 'Could not load requests');
+    } finally {
+      setFetchLoading(false);
     }
   };
 
@@ -25,6 +30,7 @@ function UserDashboard() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
     try {
       await api.post('/pickup/request', {
@@ -34,6 +40,7 @@ function UserDashboard() {
       setPickupAddress('');
       setItemDescription('');
       setQuantity(1);
+      setSuccess('Pickup request created successfully!');
       await fetchRequests();
     } catch (err) {
       setError(err.response?.data?.message || 'Could not create request');
@@ -42,85 +49,99 @@ function UserDashboard() {
     }
   };
 
-  return (
-    <div style={{ padding: '1.5rem' }}>
-      <h2>User Dashboard</h2>
-      <h3>Create Pickup Request</h3>
-      <form onSubmit={handleSubmit} style={{ maxWidth: 500 }}>
-        <div style={{ marginBottom: '0.75rem' }}>
-          <label>
-            Pickup Address
-            <input
-              type="text"
-              value={pickupAddress}
-              onChange={(e) => setPickupAddress(e.target.value)}
-              required
-              style={{ width: '100%', padding: '0.5rem' }}
-            />
-          </label>
-        </div>
-        <div style={{ marginBottom: '0.75rem' }}>
-          <label>
-            Item Description
-            <input
-              type="text"
-              value={itemDescription}
-              onChange={(e) => setItemDescription(e.target.value)}
-              required
-              style={{ width: '100%', padding: '0.5rem' }}
-            />
-          </label>
-        </div>
-        <div style={{ marginBottom: '0.75rem' }}>
-          <label>
-            Quantity
-            <input
-              type="number"
-              min="1"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              required
-              style={{ width: '100%', padding: '0.5rem' }}
-            />
-          </label>
-        </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit" disabled={loading}>
-          {loading ? 'Submitting...' : 'Submit Request'}
-        </button>
-      </form>
+  const getStatusBadgeClass = (status) => {
+    return `status-badge status-${status}`;
+  };
 
-      <h3 style={{ marginTop: '2rem' }}>My Requests</h3>
-      {requests.length === 0 ? (
-        <p>No requests yet.</p>
-      ) : (
-        <table border="1" cellPadding="8" style={{ borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              <th>Created At</th>
-              <th>Address</th>
-              <th>Item</th>
-              <th>Quantity</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {requests.map((r) => (
-              <tr key={r._id}>
-                <td>{new Date(r.createdAt).toLocaleString()}</td>
-                <td>{r.pickupAddress}</td>
-                <td>{r.items?.[0]?.description}</td>
-                <td>{r.items?.[0]?.quantity}</td>
-                <td>{r.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+  return (
+    <div className="container">
+      <div className="card">
+        <h2>User Dashboard</h2>
+        <h3>Create Pickup Request</h3>
+        {error && <div className="message message-error">{error}</div>}
+        {success && <div className="message message-success">{success}</div>}
+        <form onSubmit={handleSubmit} style={{ maxWidth: 500 }}>
+          <div className="form-group">
+            <label>
+              Pickup Address
+              <input
+                type="text"
+                value={pickupAddress}
+                onChange={(e) => setPickupAddress(e.target.value)}
+                required
+                placeholder="Enter your address"
+              />
+            </label>
+          </div>
+          <div className="form-group">
+            <label>
+              Item Description
+              <input
+                type="text"
+                value={itemDescription}
+                onChange={(e) => setItemDescription(e.target.value)}
+                required
+                placeholder="e.g., Old Laptop, Mobile Phone"
+              />
+            </label>
+          </div>
+          <div className="form-group">
+            <label>
+              Quantity
+              <input
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                required
+              />
+            </label>
+          </div>
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? 'Submitting...' : 'Submit Request'}
+          </button>
+        </form>
+      </div>
+
+      <div className="card">
+        <h3>My Requests</h3>
+        {fetchLoading ? (
+          <div className="loading">Loading requests...</div>
+        ) : requests.length === 0 ? (
+          <p>No requests yet. Create your first pickup request above!</p>
+        ) : (
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Created At</th>
+                  <th>Address</th>
+                  <th>Item</th>
+                  <th>Quantity</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {requests.map((r) => (
+                  <tr key={r._id}>
+                    <td>{new Date(r.createdAt).toLocaleString()}</td>
+                    <td>{r.pickupAddress}</td>
+                    <td>{r.items?.[0]?.description || 'N/A'}</td>
+                    <td>{r.items?.[0]?.quantity || 0}</td>
+                    <td>
+                      <span className={getStatusBadgeClass(r.status)}>
+                        {r.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
 export default UserDashboard;
-
-

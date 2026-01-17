@@ -40,7 +40,7 @@ router.put('/assign/:id', protect, authorize('admin'), async (req, res) => {
     res.json(request);
   } catch (error) {
     res.status(500).json({ message: error.message });
-  }
+    }
 });
 
 // GET /api/admin/reports - Basic stats
@@ -64,6 +64,54 @@ router.get('/reports', protect, authorize('admin'), async (req, res) => {
       totalAgents,
       totalRecyclers,
       recyclingRecords,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+/**
+ * GET /api/admin/pending-accounts - View all pending accounts
+ * Returns all accounts with 'pending' status that need admin approval
+ */
+router.get('/pending-accounts', protect, authorize('admin'), async (req, res) => {
+  try {
+    const pendingAccounts = await User.find({ status: 'pending' })
+      .select('-password')
+      .sort({ createdAt: -1 });
+    res.json(pendingAccounts);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+/**
+ * PUT /api/admin/approve-account/:id - Approve a pending account
+ * Changes account status from 'pending' to 'active', allowing login
+ */
+router.put('/approve-account/:id', protect, authorize('admin'), async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.status !== 'pending') {
+      return res.status(400).json({ message: 'Account is not pending approval' });
+    }
+
+    // Approve account: change status to 'active'
+    user.status = 'active';
+    await user.save();
+
+    // Return user data without password
+    const userData = user.toObject();
+    delete userData.password;
+
+    res.json({
+      message: 'Account approved successfully',
+      user: userData,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

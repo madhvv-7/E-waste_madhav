@@ -37,7 +37,7 @@ router.put('/collect/:id', protect, authorize('agent'), async (req, res) => {
     res.json(request);
   } catch (error) {
     res.status(500).json({ message: error.message });
-  }
+    }
 });
 
 // PUT /api/agent/send-to-recycler/:id - Mark as sent to recycler
