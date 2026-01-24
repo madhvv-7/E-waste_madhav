@@ -605,7 +605,7 @@ function AdminDashboard() {
                                   color: '#666',
                                 }}
                               >
-                                (Read-only)
+                                
                               </span>
                             )}
                           </td>
