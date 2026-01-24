@@ -78,7 +78,14 @@ router.get('/agents', protect, authorize('admin'), async (req, res) => {
   }
 });
 
-// PUT /api/admin/assign/:id - Assign agent to pickup request
+/**
+ * PUT /api/admin/assign/:id - Assign agent to pickup request
+ * 
+ * Status-based assignment rules:
+ * - Only 'Requested' status requests can be assigned (assignable state)
+ * - Terminal statuses ('Recycled') are read-only and cannot be modified
+ * - Prevents reassignment of completed requests
+ */
 router.put('/assign/:id', protect, authorize('admin'), async (req, res) => {
   try {
     const { agentId } = req.body;
@@ -96,6 +103,22 @@ router.put('/assign/:id', protect, authorize('admin'), async (req, res) => {
     const request = await PickupRequest.findById(req.params.id);
     if (!request) {
       return res.status(404).json({ message: 'Pickup request not found' });
+    }
+
+    // Guard: Prevent assignment of terminal status requests (read-only)
+    const terminalStatuses = ['Recycled'];
+    if (terminalStatuses.includes(request.status)) {
+      return res.status(403).json({
+        message: 'Cannot assign agent to a request with terminal status. This request is read-only.',
+      });
+    }
+
+    // Guard: Only allow assignment for assignable states
+    const assignableStatuses = ['Requested'];
+    if (!assignableStatuses.includes(request.status)) {
+      return res.status(400).json({
+        message: `Cannot assign agent to a request with status '${request.status}'. Only 'Requested' requests can be assigned.`,
+      });
     }
 
     request.assignedAgentId = agentId;

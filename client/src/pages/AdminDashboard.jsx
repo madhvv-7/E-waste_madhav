@@ -84,6 +84,20 @@ function AdminDashboard() {
       setError('Please select a request and choose an agent');
       return;
     }
+
+    // Frontend guard: Check if selected request is assignable
+    const selectedRequest = requests.find((r) => r._id === selectedRequestId);
+    if (selectedRequest) {
+      if (selectedRequest.status === 'Recycled') {
+        setError('Cannot assign agent to a completed request. This request is read-only.');
+        return;
+      }
+      if (selectedRequest.status !== 'Requested') {
+        setError(`Cannot assign agent to a request with status '${selectedRequest.status}'. Only 'Requested' requests can be assigned.`);
+        return;
+      }
+    }
+
     setError('');
     setSuccess('');
     setSubmitting(true);
@@ -498,27 +512,17 @@ function AdminDashboard() {
               {reports.statusCounts && reports.statusCounts.length > 0 && (
                 <div style={{ marginTop: '1.5rem' }}>
                   <h3>Status Breakdown</h3>
-                  <div className="table-container">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Status</th>
-                          <th>Count</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {reports.statusCounts.map((s) => (
-                          <tr key={s._id}>
-                            <td>
-                              <span className={getStatusBadgeClass(s._id)}>
-                                {s._id}
-                              </span>
-                            </td>
-                            <td>{s.count}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  <div className="stats-grid">
+                    {reports.statusCounts.map((s) => (
+                      <div key={s._id} className="stat-card">
+                        <h3>{s.count}</h3>
+                        <p>
+                          <span className={getStatusBadgeClass(s._id)}>
+                            {s._id}
+                          </span>
+                        </p>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
@@ -545,30 +549,70 @@ function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {requests.map((r) => (
-                      <tr key={r._id}>
-                        <td>
-                          <input
-                            type="radio"
-                            name="request"
-                            value={r._id}
-                            checked={selectedRequestId === r._id}
-                            onChange={() => setSelectedRequestId(r._id)}
-                          />
-                        </td>
-                        <td>{new Date(r.createdAt).toLocaleString()}</td>
-                        <td>{r.userId?.name || 'N/A'}</td>
-                        <td>{r.pickupAddress}</td>
-                        <td>{r.items?.[0]?.description || 'N/A'}</td>
-                        <td>{r.items?.[0]?.quantity || 0}</td>
-                        <td>
-                          <span className={getStatusBadgeClass(r.status)}>
-                            {r.status}
-                          </span>
-                        </td>
-                        <td>{r.assignedAgentId?.name || 'Not assigned'}</td>
-                      </tr>
-                    ))}
+                    {requests.map((r) => {
+                      // Determine if request is assignable (only 'Requested' status)
+                      const isAssignable = r.status === 'Requested';
+                      // Determine if request is terminal/read-only ('Recycled' status)
+                      const isTerminal = r.status === 'Recycled';
+                      const isDisabled = isTerminal || !isAssignable;
+
+                      return (
+                        <tr key={r._id} style={isDisabled ? { opacity: 0.6 } : {}}>
+                          <td>
+                            <input
+                              type="radio"
+                              name="request"
+                              value={r._id}
+                              checked={selectedRequestId === r._id}
+                              onChange={() => {
+                                // Only allow selection of assignable requests
+                                if (isAssignable) {
+                                  setSelectedRequestId(r._id);
+                                } else {
+                                  // Clear selection if trying to select non-assignable request
+                                  setSelectedRequestId('');
+                                  setError(
+                                    isTerminal
+                                      ? 'Cannot select completed request. Only "Requested" status requests can be assigned.'
+                                      : `Cannot select request with status "${r.status}". Only "Requested" status requests can be assigned.`
+                                  );
+                                }
+                              }}
+                              disabled={isDisabled}
+                              title={
+                                isTerminal
+                                  ? 'This request is completed and cannot be modified'
+                                  : !isAssignable
+                                  ? 'This request cannot be assigned in its current status'
+                                  : 'Select this request to assign an agent'
+                              }
+                            />
+                          </td>
+                          <td>{new Date(r.createdAt).toLocaleString()}</td>
+                          <td>{r.userId?.name || 'N/A'}</td>
+                          <td>{r.pickupAddress}</td>
+                          <td>{r.items?.[0]?.description || 'N/A'}</td>
+                          <td>{r.items?.[0]?.quantity || 0}</td>
+                          <td>
+                            <span className={getStatusBadgeClass(r.status)}>
+                              {r.status}
+                            </span>
+                            {isTerminal && (
+                              <span
+                                style={{
+                                  marginLeft: '0.5rem',
+                                  fontSize: '0.75rem',
+                                  color: '#666',
+                                }}
+                              >
+                                (Read-only)
+                              </span>
+                            )}
+                          </td>
+                          <td>{r.assignedAgentId?.name || 'Not assigned'}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -577,42 +621,67 @@ function AdminDashboard() {
 
           <div className="card">
             <h3>Assign Agent to Selected Request</h3>
-            <form onSubmit={handleAssign} style={{ maxWidth: 500 }}>
-              <div className="form-group">
-                <label>
-                  Select Agent
-                  <select
-                    value={agentId}
-                    onChange={(e) => setAgentId(e.target.value)}
-                    required
-                    disabled={submitting || activeAgents.length === 0}
+            {(() => {
+              // Check if selected request is assignable
+              const selectedRequest = requests.find((r) => r._id === selectedRequestId);
+              const isSelectedTerminal = selectedRequest?.status === 'Recycled';
+              const isSelectedAssignable = selectedRequest?.status === 'Requested';
+              const isFormDisabled = !selectedRequestId || isSelectedTerminal || !isSelectedAssignable || submitting || activeAgents.length === 0;
+
+              return (
+                <form onSubmit={handleAssign} style={{ maxWidth: 500 }}>
+                  {selectedRequestId && (
+                    <div style={{ marginBottom: '1rem', padding: '0.75rem', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
+                      <strong>Selected Request:</strong> {selectedRequest?.items?.[0]?.description || 'N/A'} - Status: {selectedRequest?.status}
+                      {isSelectedTerminal && (
+                        <p style={{ marginTop: '0.5rem', color: '#721c24', fontSize: '0.875rem' }}>
+                          ⚠️ This request is completed and cannot be assigned. Only 'Requested' status requests can be assigned.
+                        </p>
+                      )}
+                      {selectedRequest && !isSelectedTerminal && !isSelectedAssignable && (
+                        <p style={{ marginTop: '0.5rem', color: '#856404', fontSize: '0.875rem' }}>
+                          ⚠️ This request cannot be assigned in its current status. Only 'Requested' status requests can be assigned.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  <div className="form-group">
+                    <label>
+                      Select Agent
+                      <select
+                        value={agentId}
+                        onChange={(e) => setAgentId(e.target.value)}
+                        required
+                        disabled={isFormDisabled}
+                      >
+                        <option value="">
+                          {activeAgents.length === 0
+                            ? 'No active agents available'
+                            : '-- Select an agent --'}
+                        </option>
+                        {activeAgents.map((agent) => (
+                          <option key={agent._id} value={agent._id}>
+                            {agent.name} ({agent.email})
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    {activeAgents.length === 0 && (
+                      <p style={{ fontSize: '0.875rem', color: '#666', marginTop: '0.5rem' }}>
+                        No active agents available. Approve agent accounts to make them available for assignment.
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={isFormDisabled}
                   >
-                    <option value="">
-                      {activeAgents.length === 0
-                        ? 'No active agents available'
-                        : '-- Select an agent --'}
-                    </option>
-                    {activeAgents.map((agent) => (
-                      <option key={agent._id} value={agent._id}>
-                        {agent.name} ({agent.email})
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                {activeAgents.length === 0 && (
-                  <p style={{ fontSize: '0.875rem', color: '#666', marginTop: '0.5rem' }}>
-                    No active agents available. Approve agent accounts to make them available for assignment.
-                  </p>
-                )}
-              </div>
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={!selectedRequestId || !agentId || submitting || activeAgents.length === 0}
-              >
-                {submitting ? 'Assigning...' : 'Assign Agent'}
-              </button>
-            </form>
+                    {submitting ? 'Assigning...' : 'Assign Agent'}
+                  </button>
+                </form>
+              );
+            })()}
           </div>
         </>
       )}
