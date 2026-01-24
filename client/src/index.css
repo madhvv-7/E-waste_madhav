@@ -257,6 +257,11 @@ table tbody tr:last-child td {
   color: #721c24;
 }
 
+.status-deactivated {
+  background-color: #e2e3e5;
+  color: #383d41;
+}
+
 /* Messages */
 .message {
   padding: 1rem;

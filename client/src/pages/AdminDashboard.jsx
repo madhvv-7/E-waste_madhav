@@ -6,6 +6,7 @@ function AdminDashboard() {
   const [reports, setReports] = useState(null);
   const [allUsers, setAllUsers] = useState([]);
   const [pendingAccounts, setPendingAccounts] = useState([]);
+  const [activeAgents, setActiveAgents] = useState([]);
   const [agentId, setAgentId] = useState('');
   const [selectedRequestId, setSelectedRequestId] = useState('');
   const [error, setError] = useState('');
@@ -14,6 +15,32 @@ function AdminDashboard() {
   const [submitting, setSubmitting] = useState(false);
   const [approving, setApproving] = useState('');
   const [rejecting, setRejecting] = useState('');
+  const [deactivating, setDeactivating] = useState('');
+  const [reactivating, setReactivating] = useState('');
+
+  // Fetch active agents for dropdown
+  const fetchActiveAgents = async () => {
+    try {
+      console.log('[DEBUG] Fetching active agents from API...');
+      const agentsRes = await api.get('/admin/agents');
+      console.log('[DEBUG] API Response:', agentsRes);
+      console.log('[DEBUG] Agents data:', agentsRes.data);
+      console.log('[DEBUG] Agents count:', agentsRes.data?.length || 0);
+      console.log('[DEBUG] Agents array:', Array.isArray(agentsRes.data));
+      
+      if (agentsRes.data && Array.isArray(agentsRes.data)) {
+        setActiveAgents(agentsRes.data);
+        console.log('[DEBUG] Active agents set in state:', agentsRes.data.length);
+      } else {
+        console.warn('[DEBUG] Invalid agents data format:', agentsRes.data);
+        setActiveAgents([]);
+      }
+    } catch (err) {
+      console.error('[DEBUG] Error loading agents:', err);
+      console.error('[DEBUG] Error response:', err.response);
+      setActiveAgents([]);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -28,6 +55,9 @@ function AdminDashboard() {
       setReports(repRes.data);
       setAllUsers(usersRes.data);
       setPendingAccounts(pendingRes.data);
+      
+      // Fetch active agents separately
+      await fetchActiveAgents();
     } catch (err) {
       setError(err.response?.data?.message || 'Could not load admin data');
     } finally {
@@ -39,21 +69,36 @@ function AdminDashboard() {
     fetchData();
   }, []);
 
+  // Debug: Monitor activeAgents state changes
+  useEffect(() => {
+    console.log('[DEBUG] activeAgents state changed:', activeAgents);
+    console.log('[DEBUG] activeAgents length:', activeAgents.length);
+    if (activeAgents.length > 0) {
+      console.log('[DEBUG] First agent:', activeAgents[0]);
+    }
+  }, [activeAgents]);
+
   const handleAssign = async (e) => {
     e.preventDefault();
     if (!selectedRequestId || !agentId) {
-      setError('Please select a request and enter agent ID');
+      setError('Please select a request and choose an agent');
       return;
     }
     setError('');
     setSuccess('');
     setSubmitting(true);
     try {
-      await api.put(`/admin/assign/${selectedRequestId}`, { agentId });
+      const res = await api.put(`/admin/assign/${selectedRequestId}`, { agentId });
       setAgentId('');
       setSelectedRequestId('');
-      setSuccess('Agent assigned successfully!');
-      await fetchData();
+      setSuccess(res.data.message || 'Agent assigned successfully!');
+      
+      // Refresh requests and agents to show updated assignment
+      const [reqRes] = await Promise.all([
+        api.get('/admin/requests'),
+        fetchActiveAgents(),
+      ]);
+      setRequests(reqRes.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Could not assign agent');
     } finally {
@@ -77,6 +122,12 @@ function AdminDashboard() {
         )
       );
       
+      // Refresh agents list if approved user is an agent
+      const approvedUser = allUsers.find((u) => u._id === accountId);
+      if (approvedUser && approvedUser.role === 'agent') {
+        await fetchActiveAgents();
+      }
+      
       setSuccess('Account approved successfully!');
     } catch (err) {
       setError(err.response?.data?.message || 'Could not approve account');
@@ -86,6 +137,7 @@ function AdminDashboard() {
   };
 
   // Reject account: update status to rejected, refresh data immediately
+  // Works for pending or active agent/recycler accounts
   const handleRejectAccount = async (accountId) => {
     setError('');
     setSuccess('');
@@ -95,11 +147,17 @@ function AdminDashboard() {
       
       // Update UI immediately without page refresh
       setPendingAccounts((prev) => prev.filter((acc) => acc._id !== accountId));
+      const rejectedUser = allUsers.find((u) => u._id === accountId);
       setAllUsers((prev) =>
         prev.map((user) =>
           user._id === accountId ? { ...user, status: 'rejected' } : user
         )
       );
+      
+      // Refresh agents list if rejected user is an agent
+      if (rejectedUser && rejectedUser.role === 'agent') {
+        await fetchActiveAgents();
+      }
       
       setSuccess('Account rejected successfully!');
     } catch (err) {
@@ -109,17 +167,173 @@ function AdminDashboard() {
     }
   };
 
+  // Deactivate account: update status to deactivated, refresh data immediately
+  const handleDeactivateAccount = async (accountId) => {
+    setError('');
+    setSuccess('');
+    setDeactivating(accountId);
+    try {
+      await api.put(`/admin/deactivate-account/${accountId}`);
+      
+      // Update UI immediately without page refresh
+      setAllUsers((prev) =>
+        prev.map((user) =>
+          user._id === accountId ? { ...user, status: 'deactivated' } : user
+        )
+      );
+      
+      // Refresh agents list if deactivated user is an agent
+      const deactivatedUser = allUsers.find((u) => u._id === accountId);
+      if (deactivatedUser && deactivatedUser.role === 'agent') {
+        await fetchActiveAgents();
+      }
+      
+      setSuccess('Account deactivated successfully!');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Could not deactivate account');
+    } finally {
+      setDeactivating('');
+    }
+  };
+
+  // Reactivate account: update status to active, refresh data immediately
+  const handleReactivateAccount = async (accountId) => {
+    setError('');
+    setSuccess('');
+    setReactivating(accountId);
+    try {
+      await api.put(`/admin/reactivate-account/${accountId}`);
+      
+      // Update UI immediately without page refresh
+      setAllUsers((prev) =>
+        prev.map((user) =>
+          user._id === accountId ? { ...user, status: 'active' } : user
+        )
+      );
+      
+      // Refresh agents list if reactivated user is an agent
+      const reactivatedUser = allUsers.find((u) => u._id === accountId);
+      if (reactivatedUser && reactivatedUser.role === 'agent') {
+        await fetchActiveAgents();
+      }
+      
+      setSuccess('Account reactivated successfully!');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Could not reactivate account');
+    } finally {
+      setReactivating('');
+    }
+  };
+
   const getStatusBadgeClass = (status) => {
     // User account statuses
     if (status === 'pending') return 'status-badge status-pending';
     if (status === 'active') return 'status-badge status-active';
     if (status === 'rejected') return 'status-badge status-rejected';
+    if (status === 'deactivated') return 'status-badge status-deactivated';
     // Pickup request statuses (fallback)
     if (status === 'Requested') return 'status-badge status-Requested';
     if (status === 'Collected') return 'status-badge status-Collected';
     if (status === 'SentToRecycler') return 'status-badge status-SentToRecycler';
     if (status === 'Recycled') return 'status-badge status-Recycled';
     return 'status-badge';
+  };
+
+  // Determine which action buttons to show based on role and status
+  const getActionButtons = (user) => {
+    const isProcessing = approving === user._id || rejecting === user._id || 
+                        deactivating === user._id || reactivating === user._id;
+    const buttons = [];
+
+    // Agent and Recycler: Show approve/reject/deactivate/reactivate based on status
+    if (user.role === 'agent' || user.role === 'recycler') {
+      if (user.status === 'pending') {
+        // Pending: Show approve and reject
+        buttons.push(
+          <button
+            key="approve"
+            onClick={() => handleApproveAccount(user._id)}
+            className="btn btn-success"
+            disabled={isProcessing}
+            style={{ marginRight: '0.5rem' }}
+          >
+            {approving === user._id ? 'Approving...' : 'Approve'}
+          </button>
+        );
+        buttons.push(
+          <button
+            key="reject"
+            onClick={() => handleRejectAccount(user._id)}
+            className="btn btn-warning"
+            disabled={isProcessing}
+          >
+            {rejecting === user._id ? 'Rejecting...' : 'Reject'}
+          </button>
+        );
+      } else if (user.status === 'active') {
+        // Active: Show reject and deactivate
+        buttons.push(
+          <button
+            key="reject"
+            onClick={() => handleRejectAccount(user._id)}
+            className="btn btn-warning"
+            disabled={isProcessing}
+            style={{ marginRight: '0.5rem' }}
+          >
+            {rejecting === user._id ? 'Rejecting...' : 'Reject'}
+          </button>
+        );
+        buttons.push(
+          <button
+            key="deactivate"
+            onClick={() => handleDeactivateAccount(user._id)}
+            className="btn btn-warning"
+            disabled={isProcessing}
+          >
+            {deactivating === user._id ? 'Deactivating...' : 'Deactivate'}
+          </button>
+        );
+      } else if (user.status === 'rejected' || user.status === 'deactivated') {
+        // Rejected or Deactivated: Show reactivate
+        buttons.push(
+          <button
+            key="reactivate"
+            onClick={() => handleReactivateAccount(user._id)}
+            className="btn btn-success"
+            disabled={isProcessing}
+          >
+            {reactivating === user._id ? 'Reactivating...' : 'Reactivate'}
+          </button>
+        );
+      }
+    } else if (user.role === 'user' || user.role === 'admin') {
+      // User and Admin: Only show deactivate/reactivate (no approval actions)
+      if (user.status === 'active') {
+        buttons.push(
+          <button
+            key="deactivate"
+            onClick={() => handleDeactivateAccount(user._id)}
+            className="btn btn-warning"
+            disabled={isProcessing}
+          >
+            {deactivating === user._id ? 'Deactivating...' : 'Deactivate'}
+          </button>
+        );
+      } else if (user.status === 'deactivated') {
+        buttons.push(
+          <button
+            key="reactivate"
+            onClick={() => handleReactivateAccount(user._id)}
+            className="btn btn-success"
+            disabled={isProcessing}
+          >
+            {reactivating === user._id ? 'Reactivating...' : 'Reactivate'}
+          </button>
+        );
+      }
+    }
+
+    return buttons.length > 0 ? buttons : <span style={{ color: '#999' }}>No actions</span>;
   };
 
   const getRoleBadgeClass = (role) => {
@@ -225,6 +439,7 @@ function AdminDashboard() {
                       <th>Phone</th>
                       <th>Address</th>
                       <th>Registered At</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -245,6 +460,7 @@ function AdminDashboard() {
                         <td>{user.phone || 'N/A'}</td>
                         <td>{user.address || 'N/A'}</td>
                         <td>{new Date(user.createdAt).toLocaleString()}</td>
+                        <td>{getActionButtons(user)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -364,20 +580,35 @@ function AdminDashboard() {
             <form onSubmit={handleAssign} style={{ maxWidth: 500 }}>
               <div className="form-group">
                 <label>
-                  Agent User ID
-                  <input
-                    type="text"
+                  Select Agent
+                  <select
                     value={agentId}
                     onChange={(e) => setAgentId(e.target.value)}
-                    placeholder="Enter agent's user ID"
                     required
-                  />
+                    disabled={submitting || activeAgents.length === 0}
+                  >
+                    <option value="">
+                      {activeAgents.length === 0
+                        ? 'No active agents available'
+                        : '-- Select an agent --'}
+                    </option>
+                    {activeAgents.map((agent) => (
+                      <option key={agent._id} value={agent._id}>
+                        {agent.name} ({agent.email})
+                      </option>
+                    ))}
+                  </select>
                 </label>
+                {activeAgents.length === 0 && (
+                  <p style={{ fontSize: '0.875rem', color: '#666', marginTop: '0.5rem' }}>
+                    No active agents available. Approve agent accounts to make them available for assignment.
+                  </p>
+                )}
               </div>
               <button
                 type="submit"
                 className="btn btn-primary"
-                disabled={!selectedRequestId || !agentId || submitting}
+                disabled={!selectedRequestId || !agentId || submitting || activeAgents.length === 0}
               >
                 {submitting ? 'Assigning...' : 'Assign Agent'}
               </button>

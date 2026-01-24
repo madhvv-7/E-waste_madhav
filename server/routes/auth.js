@@ -217,11 +217,23 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Check if account is active (pending accounts cannot login)
+    // Check account status - only active accounts can login
     if (user.status === 'pending') {
       return res.status(403).json({
         message: 'Your account is pending admin approval. Please wait for approval before logging in.',
         status: 'pending',
+      });
+    }
+    if (user.status === 'rejected') {
+      return res.status(403).json({
+        message: 'Your account has been rejected. Please contact administrator.',
+        status: 'rejected',
+      });
+    }
+    if (user.status === 'deactivated') {
+      return res.status(403).json({
+        message: 'Your account has been deactivated. Please contact administrator.',
+        status: 'deactivated',
       });
     }
 
