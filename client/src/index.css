@@ -241,6 +241,22 @@ table tbody tr:last-child td {
   color: #155724;
 }
 
+/* User account status badges */
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-active {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
 /* Messages */
 .message {
   padding: 1rem;
