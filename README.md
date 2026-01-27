@@ -2,7 +2,7 @@
 
 A full-stack MERN (MongoDB, Express, React, Node.js) web application for managing e-waste collection and recycling processes. This system connects Users (Citizens), Collection Agents, Recyclers, and Administrators to facilitate responsible e-waste disposal.
 
-## 📋 Table of Contents
+##Table of Contents
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
@@ -17,7 +17,7 @@ A full-stack MERN (MongoDB, Express, React, Node.js) web application for managin
 - [Screenshots](#screenshots)
 - [Testing](#testing)
 
-## ✨ Features
+##Features
 
 - **User Registration & Authentication**: JWT-based authentication for all user roles
 - **Role-Based Access Control**: Four distinct user roles with appropriate permissions
@@ -28,7 +28,7 @@ A full-stack MERN (MongoDB, Express, React, Node.js) web application for managin
 - **Admin Dashboard**: Comprehensive system reports and analytics
 - **Responsive UI**: Clean, modern interface with intuitive navigation
 
-## 🛠 Tech Stack
+##Tech Stack
 
 ### Frontend
 - **React 19** - UI library
@@ -36,7 +36,7 @@ A full-stack MERN (MongoDB, Express, React, Node.js) web application for managin
 - **Axios** - HTTP client
 - **Vite** - Build tool
 
-### Backend
+###Backend
 - **Node.js** - Runtime environment
 - **Express.js** - Web framework
 - **MongoDB** - Database
@@ -44,7 +44,7 @@ A full-stack MERN (MongoDB, Express, React, Node.js) web application for managin
 - **JWT** - Authentication tokens
 - **bcryptjs** - Password hashing
 
-## 📁 Project Structure
+##Project Structure
 
 ```
 Main_Project/
@@ -69,7 +69,7 @@ Main_Project/
 └── README.md              # This file
 ```
 
-## 📋 Prerequisites
+##Prerequisites
 
 Before running this application, ensure you have the following installed:
 
@@ -77,7 +77,7 @@ Before running this application, ensure you have the following installed:
 - **npm** (v6 or higher) or **yarn**
 - **MongoDB** (Local installation or MongoDB Atlas account)
 
-## 🚀 Installation
+##Installation
 
 ### 1. Clone the Repository
 
@@ -100,7 +100,7 @@ cd ../client
 npm install
 ```
 
-## ⚙️ Configuration
+##Configuration
 
 ### Backend Configuration
 
@@ -121,7 +121,7 @@ JWT_SECRET=your_super_secret_jwt_key_change_this_in_production
 
 The frontend is configured to connect to `http://localhost:5000` by default. If your backend runs on a different port, update `client/src/api.js`.
 
-## ▶️ Running the Application
+##Running the Application
 
 ### Start MongoDB
 
@@ -162,7 +162,7 @@ Open your browser and navigate to:
 - Frontend: `http://localhost:5173`
 - Backend API: `http://localhost:5000`
 
-## 👥 User Roles
+##User Roles
 
 ### 1. User (Citizen)
 - Register and login
@@ -189,7 +189,7 @@ Open your browser and navigate to:
 - View system reports and statistics
 - Monitor entire workflow
 
-## 🔌 API Endpoints
+##API Endpoints
 
 ### Authentication
 - `POST /api/auth/register` - Register new user
@@ -215,7 +215,7 @@ Open your browser and navigate to:
 
 **Note**: All routes except `/api/auth/register` and `/api/auth/login` require authentication via JWT token.
 
-## 🔄 Workflow
+##Workflow
 
 1. **User creates request**: Citizen registers and creates a pickup request
 2. **Admin assigns agent**: Admin views the request and assigns it to an agent
@@ -224,11 +224,11 @@ Open your browser and navigate to:
 5. **Recycler processes**: Recycler marks the item as "Recycled" with details
 6. **User sees completion**: User can track the status through all stages
 
-## 📸 Screenshots
+##Screenshots
 
 *Add screenshots of your application here for documentation*
 
-## 🧪 Testing
+##Testing
 
 ### Manual Testing Workflow
 
@@ -255,26 +255,25 @@ Open your browser and navigate to:
 
 A seed script is available to create test users. See `server/scripts/seed.js` for details.
 
-## 📝 Notes
+##Notes
 
 - This is a demonstration project for academic purposes
 - JWT tokens expire after 30 days
 - Passwords are hashed using bcrypt
 - All routes are protected with role-based authorization
 
-## 🤝 Contributing
+##Contributing
 
 This is a final year project. For questions or issues, please contact the project maintainer.
 
-## 📄 License
+##License
 
 This project is created for academic purposes.
 
-## 👨‍💻 Author
+##Author
 
-*Your Name*  
-*Final Year Project - [Year]*
+Madhav S
+
+Final Year Project - [2026]
 
 ---
-
-**Built with ❤️ using the MERN Stack**
