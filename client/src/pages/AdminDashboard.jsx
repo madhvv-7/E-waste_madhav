@@ -285,18 +285,6 @@ function AdminDashboard() {
           </button>
         );
       } else if (user.status === 'active') {
-        // Active: Show reject and deactivate
-        buttons.push(
-          <button
-            key="reject"
-            onClick={() => handleRejectAccount(user._id)}
-            className="btn btn-warning"
-            disabled={isProcessing}
-            style={{ marginRight: '0.5rem' }}
-          >
-            {rejecting === user._id ? 'Rejecting...' : 'Reject'}
-          </button>
-        );
         buttons.push(
           <button
             key="deactivate"
