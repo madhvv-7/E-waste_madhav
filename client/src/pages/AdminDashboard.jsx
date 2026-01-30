@@ -497,20 +497,53 @@ function AdminDashboard() {
                 </div>
               </div>
 
-              {reports.statusCounts && reports.statusCounts.length > 0 && (
+              {reports && (
                 <div style={{ marginTop: '1.5rem' }}>
                   <h3>Status Breakdown</h3>
                   <div className="stats-grid">
-                    {reports.statusCounts.map((s) => (
-                      <div key={s._id} className="stat-card">
-                        <h3>{s.count}</h3>
-                        <p>
-                          <span className={getStatusBadgeClass(s._id)}>
-                            {s._id}
-                          </span>
-                        </p>
-                      </div>
-                    ))}
+                    {(() => {
+                      // Fixed ordered list of all pickup request workflow statuses
+                      const allStatuses = ['Requested', 'Assigned', 'Collected', 'SentToRecycler', 'Recycled'];
+                      
+                      // Create a map from backend statusCounts for quick lookup
+                      const statusCountMap = {};
+                      if (reports.statusCounts && Array.isArray(reports.statusCounts)) {
+                        reports.statusCounts.forEach((item) => {
+                          statusCountMap[item._id] = item.count;
+                        });
+                      }
+                      
+                      // Render all statuses, defaulting to 0 for missing ones
+                      return allStatuses.map((status) => {
+                        const count = statusCountMap[status] || 0;
+                        const hasCount = count > 0;
+                        
+                        return (
+                          <div
+                            key={status}
+                            className="stat-card"
+                            style={{
+                              opacity: hasCount ? 1 : 0.5,
+                              backgroundColor: hasCount ? 'white' : '#f8f9fa',
+                            }}
+                          >
+                            <h3 style={{ color: hasCount ? '#3498db' : '#999' }}>
+                              {count}
+                            </h3>
+                            <p>
+                              <span
+                                className={getStatusBadgeClass(status)}
+                                style={{
+                                  opacity: hasCount ? 1 : 0.6,
+                                }}
+                              >
+                                {status}
+                              </span>
+                            </p>
+                          </div>
+                        );
+                      });
+                    })()}
                   </div>
                 </div>
               )}
