@@ -49,6 +49,26 @@ function AgentDashboard() {
     return `status-badge status-${status}`;
   };
 
+  // Calculate status counts from existing requests data
+  const calculateStatusCounts = () => {
+    const statusCounts = {
+      Requested: 0,
+      Collected: 0,
+      SentToRecycler: 0,
+      Recycled: 0,
+    };
+
+    requests.forEach((request) => {
+      if (statusCounts.hasOwnProperty(request.status)) {
+        statusCounts[request.status]++;
+      }
+    });
+
+    return statusCounts;
+  };
+
+  const statusCounts = calculateStatusCounts();
+
   return (
     <div className="container">
       <div className="card">
@@ -56,6 +76,51 @@ function AgentDashboard() {
         <p>View and manage your assigned pickup requests</p>
         {error && <div className="message message-error">{error}</div>}
         {success && <div className="message message-success">{success}</div>}
+      </div>
+
+      {/* Summary Cards Section */}
+      {!loading && (
+        <div className="card">
+          <h3>Request Summary</h3>
+          <div className="stats-grid">
+            <div className="stat-card">
+              <h3>{statusCounts.Requested}</h3>
+              <p>
+                <span className={getStatusBadgeClass('Requested')}>
+                  Requested
+                </span>
+              </p>
+            </div>
+            <div className="stat-card">
+              <h3>{statusCounts.Collected}</h3>
+              <p>
+                <span className={getStatusBadgeClass('Collected')}>
+                  Collected
+                </span>
+              </p>
+            </div>
+            <div className="stat-card">
+              <h3>{statusCounts.SentToRecycler}</h3>
+              <p>
+                <span className={getStatusBadgeClass('SentToRecycler')}>
+                  Sent to Recycler
+                </span>
+              </p>
+            </div>
+            <div className="stat-card">
+              <h3>{statusCounts.Recycled}</h3>
+              <p>
+                <span className={getStatusBadgeClass('Recycled')}>
+                  Recycled
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="card">
+        <h3>Assigned Pickup Requests</h3>
         {loading ? (
           <div className="loading">Loading requests...</div>
         ) : requests.length === 0 ? (
