@@ -8,6 +8,7 @@ function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorStatus, setErrorStatus] = useState('');
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -22,6 +23,7 @@ function Login() {
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
+      setErrorStatus(err.response?.data?.status || '');
     } finally {
       setLoading(false);
     }
@@ -32,6 +34,16 @@ function Login() {
       <div className="card" style={{ maxWidth: 400, margin: '2rem auto' }}>
         <h2>Login</h2>
         {error && <div className="message message-error">{error}</div>}
+        {errorStatus && (errorStatus === 'rejected' || errorStatus === 'deactivated') && (
+          <div style={{ marginTop: '0.5rem' }}>
+            <Link
+              to={`/contact-admin?email=${encodeURIComponent(form.email || '')}`}
+              className="btn btn-secondary"
+            >
+              Contact Admin
+            </Link>
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>

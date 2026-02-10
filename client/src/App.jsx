@@ -4,6 +4,7 @@ import ProtectedRoute from './ProtectedRoute';
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ContactAdmin from './pages/ContactAdmin';
 import UserDashboard from './pages/UserDashboard';
 import AgentDashboard from './pages/AgentDashboard';
 import RecyclerDashboard from './pages/RecyclerDashboard';
@@ -59,6 +60,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/contact-admin" element={<ContactAdmin />} />
         <Route
           path="/user/dashboard"
           element={

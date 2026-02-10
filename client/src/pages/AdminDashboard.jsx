@@ -6,6 +6,7 @@ function AdminDashboard() {
   const [reports, setReports] = useState(null);
   const [allUsers, setAllUsers] = useState([]);
   const [pendingAccounts, setPendingAccounts] = useState([]);
+  const [appeals, setAppeals] = useState([]); // User appeals/contact requests
   const [activeAgents, setActiveAgents] = useState([]);
   const [agentId, setAgentId] = useState('');
   const [selectedRequestId, setSelectedRequestId] = useState('');
@@ -17,6 +18,7 @@ function AdminDashboard() {
   const [rejecting, setRejecting] = useState('');
   const [deactivating, setDeactivating] = useState('');
   const [reactivating, setReactivating] = useState('');
+  const [appealProcessing, setAppealProcessing] = useState(''); // id of appeal being processed
 
   // Fetch active agents for dropdown
   const fetchActiveAgents = async () => {
@@ -45,16 +47,18 @@ function AdminDashboard() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [reqRes, repRes, usersRes, pendingRes] = await Promise.all([
+      const [reqRes, repRes, usersRes, pendingRes, appealsRes] = await Promise.all([
         api.get('/admin/requests'),
         api.get('/admin/reports'),
         api.get('/admin/users'),
         api.get('/admin/pending-accounts'),
+        api.get('/appeals'),
       ]);
       setRequests(reqRes.data);
       setReports(repRes.data);
       setAllUsers(usersRes.data);
       setPendingAccounts(pendingRes.data);
+      setAppeals(appealsRes.data || []);
       
       // Fetch active agents separately
       await fetchActiveAgents();
@@ -236,6 +240,103 @@ function AdminDashboard() {
       setError(err.response?.data?.message || 'Could not reactivate account');
     } finally {
       setReactivating('');
+    }
+  };
+
+  // Handle resolving appeals (approve => reactivate user + resolve appeal, reject => resolve appeal only)
+  const handleResolveAppeal = async (appealId, action) => {
+    setError('');
+    setSuccess('');
+    setAppealProcessing(appealId);
+    try {
+      await api.put(`/appeals/${appealId}/resolve`, { action });
+
+      // Update appeals list locally
+      setAppeals((prev) => prev.map((a) => (a._id === appealId ? { ...a, resolved: true } : a)));
+
+      if (action === 'approve') {
+        // If approved, set the user's status to active in allUsers
+        const appeal = appeals.find((a) => a._id === appealId);
+        const userId = appeal?.userId?._id || appeal?.userId;
+        if (userId) {
+          setAllUsers((prev) =>
+            prev.map((u) => (u._id === userId ? { ...u, status: 'active' } : u))
+          );
+          // Remove from pendingAccounts if present
+          setPendingAccounts((prev) => prev.filter((p) => p._id !== userId));
+          // Refresh active agents if role is agent
+          if (appeal?.userId?.role === 'agent' || appeal?.role === 'agent') {
+            await fetchActiveAgents();
+          }
+        }
+      }
+
+      setSuccess('Appeal resolved successfully.');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Could not resolve appeal');
+    } finally {
+      setAppealProcessing('');
+    }
+  };
+
+  // --- Add Recycler (admin only) ---
+  const [newRecycler, setNewRecycler] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    password: '',
+  });
+  const [creatingRecycler, setCreatingRecycler] = useState(false);
+
+  const handleNewRecyclerChange = (e) => {
+    const { name, value } = e.target;
+    setNewRecycler((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCreateRecycler = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setCreatingRecycler(true);
+    try {
+      // Create recycler via public register endpoint (role fixed to 'recycler')
+      const payload = {
+        name: newRecycler.name,
+        email: newRecycler.email,
+        password: newRecycler.password,
+        confirmPassword: newRecycler.password,
+        role: 'recycler',
+        address: newRecycler.address,
+        phone: newRecycler.phone,
+      };
+
+      const res = await api.post('/auth/register', payload);
+
+      // Get created user id from response (supports both pending and active responses)
+      const createdId =
+        res.data?.user?.id || res.data?.user?._id || res.data?.user?.id;
+
+      if (!createdId) {
+        // Fallback: refresh data and inform admin
+        await fetchData();
+        setSuccess('Recycler created (could not determine id) — refreshed list.');
+        setNewRecycler({ name: '', email: '', phone: '', address: '', password: '' });
+        return;
+      }
+
+      // Approve the recycler to make it active immediately
+      await api.put(`/admin/approve-account/${createdId}`);
+
+      // Refresh admin lists
+      await fetchData();
+
+      setSuccess('Recycler account created and activated successfully.');
+      setNewRecycler({ name: '', email: '', phone: '', address: '', password: '' });
+    } catch (err) {
+      setError(err.response?.data?.message || 'Could not create recycler account');
+    } finally {
+      setCreatingRecycler(false);
     }
   };
 
@@ -463,6 +564,113 @@ function AdminDashboard() {
                         <td>{user.address || 'N/A'}</td>
                         <td>{new Date(user.createdAt).toLocaleString()}</td>
                         <td>{getActionButtons(user)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+          
+          {/* Add Recycler (admin only) */}
+          <div className="card">
+            <h3>Add Recycler (admin)</h3>
+            <p style={{ fontSize: '0.875rem', color: '#666', marginBottom: '1rem' }}>
+              Create a recycler account manually. Recycler accounts created here are activated immediately.
+            </p>
+            <form onSubmit={handleCreateRecycler} style={{ maxWidth: 600 }}>
+              <div className="form-group">
+                <label>
+                  Name
+                  <input type="text" name="name" value={newRecycler.name} onChange={handleNewRecyclerChange} required />
+                </label>
+              </div>
+              <div className="form-group">
+                <label>
+                  Email
+                  <input type="email" name="email" value={newRecycler.email} onChange={handleNewRecyclerChange} required />
+                </label>
+              </div>
+              <div className="form-group">
+                <label>
+                  Phone
+                  <input type="text" name="phone" value={newRecycler.phone} onChange={handleNewRecyclerChange} />
+                </label>
+              </div>
+              <div className="form-group">
+                <label>
+                  Address
+                  <input type="text" name="address" value={newRecycler.address} onChange={handleNewRecyclerChange} />
+                </label>
+              </div>
+              <div className="form-group">
+                <label>
+                  Password
+                  <input type="password" name="password" value={newRecycler.password} onChange={handleNewRecyclerChange} required />
+                </label>
+              </div>
+              <button type="submit" className="btn btn-primary" disabled={creatingRecycler}>
+                {creatingRecycler ? 'Creating...' : 'Create Recycler'}
+              </button>
+            </form>
+          </div>
+          
+          {/* User Appeals / Contact Requests */}
+          <div className="card">
+            <h3>User Appeals / Contact Requests</h3>
+            <p style={{ fontSize: '0.875rem', color: '#666', marginBottom: '1rem' }}>
+              Appeals submitted by rejected or deactivated users. Approve to reactivate the account and resolve the appeal, or reject to resolve without reactivation.
+            </p>
+            {appeals.length === 0 ? (
+              <p>No appeals found.</p>
+            ) : (
+              <div className="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>User</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>Status</th>
+                      <th>Message</th>
+                      <th>Submitted At</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {appeals.map((a) => (
+                      <tr key={a._id} style={a.resolved ? { opacity: 0.6 } : {}}>
+                        <td>{a.userId?.name || 'N/A'}</td>
+                        <td>{a.userId?.email || 'N/A'}</td>
+                        <td>{a.role}</td>
+                        <td>
+                          <span className={getStatusBadgeClass(a.currentStatus)}>{a.currentStatus}</span>
+                        </td>
+                        <td style={{ maxWidth: 300, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.message}</td>
+                        <td>{new Date(a.createdAt).toLocaleString()}</td>
+                        <td>
+                          {a.resolved ? (
+                            <span style={{ color: '#999' }}>Resolved</span>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => handleResolveAppeal(a._id, 'approve')}
+                                className="btn btn-success"
+                                disabled={appealProcessing === a._id}
+                                style={{ marginRight: '0.5rem' }}
+                              >
+                                {appealProcessing === a._id ? 'Processing...' : 'Approve'}
+                              </button>
+                              <button
+                                onClick={() => handleResolveAppeal(a._id, 'reject')}
+                                className="btn btn-warning"
+                                disabled={appealProcessing === a._id}
+                              >
+                                {appealProcessing === a._id ? 'Processing...' : 'Reject'}
+                              </button>
+                            </>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

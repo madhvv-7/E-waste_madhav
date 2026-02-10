@@ -324,18 +324,16 @@ function Register() {
               <select name="role" value={form.role} onChange={handleChange}>
                 <option value="user">User (Citizen)</option>
                 <option value="agent">Collection Agent</option>
-                <option value="recycler">Recycler</option>
-                <option value="admin">Admin</option>
               </select>
             </label>
-            {(form.role === 'agent' || form.role === 'recycler') && (
+            {form.role === 'agent' && (
               <p style={{ fontSize: '0.875rem', color: '#666', marginTop: '0.25rem' }}>
-                Note: {form.role} accounts require admin approval before you can login.
+                Note: Collection Agent accounts require admin approval before you can login. You will be notified once an admin approves your account.
               </p>
             )}
-            {(form.role === 'admin' || form.role === 'user') && (
+            {form.role === 'user' && (
               <p style={{ fontSize: '0.875rem', color: '#27ae60', marginTop: '0.25rem' }}>
-                {form.role === 'admin' ? 'Admin' : 'User'} accounts are activated immediately after registration.
+                User accounts are activated immediately after registration.
               </p>
             )}
           </div>

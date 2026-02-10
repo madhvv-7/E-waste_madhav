@@ -28,6 +28,7 @@ app.use('/api/pickup', require('./routes/pickup')); // User pickup requests
 app.use('/api/agent', require('./routes/agent')); // Collection agent routes
 app.use('/api/recycler', require('./routes/recycler')); // Recycler routes
 app.use('/api/admin', require('./routes/admin')); // Admin routes
+app.use('/api/appeals', require('./routes/appeals')); // Appeals (contact requests)
 
 // Health check route
 app.get('/', (req, res) => {
