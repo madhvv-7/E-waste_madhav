@@ -31,51 +31,60 @@ function Login() {
 
   return (
     <div className="container">
-      <div className="card" style={{ maxWidth: 400, margin: '2rem auto' }}>
-        <h2>Login</h2>
-        {error && <div className="message message-error">{error}</div>}
-        {errorStatus && (errorStatus === 'rejected' || errorStatus === 'deactivated') && (
-          <div style={{ marginTop: '0.5rem' }}>
-            <Link
-              to={`/contact-admin?email=${encodeURIComponent(form.email || '')}`}
-              className="btn btn-secondary"
-            >
-              Contact Admin
-            </Link>
-          </div>
-        )}
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>
-              Email
+      <div className="card shadow-sm" style={{ maxWidth: 480, margin: '2rem auto' }}>
+        <div className="card-body">
+          <h2 className="card-title mb-3">Login</h2>
+          {error && <div className="message message-error">{error}</div>}
+
+          {errorStatus && (errorStatus === 'rejected' || errorStatus === 'deactivated') && (
+            <div className="mb-3">
+              <Link
+                to={`/contact-admin?email=${encodeURIComponent(form.email || '')}`}
+                className="btn btn-outline-secondary"
+              >
+                Contact Admin
+              </Link>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label className="form-label">Email</label>
               <input
                 type="email"
                 name="email"
                 value={form.email}
                 onChange={handleChange}
                 required
+                className="form-control"
               />
-            </label>
-          </div>
-          <div className="form-group">
-            <label>
-              Password
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Password</label>
               <input
                 type="password"
                 name="password"
                 value={form.password}
                 onChange={handleChange}
                 required
+                className="form-control"
               />
-            </label>
+            </div>
+
+            <div className="d-grid">
+              <button type="submit" className="btn btn-success" disabled={loading}>
+                {loading ? 'Logging in...' : 'Login'}
+              </button>
+            </div>
+          </form>
+
+          <div className="text-center mt-3">
+            <small>
+              No account? <Link to="/register">Register</Link>
+            </small>
           </div>
-          <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
-        <p style={{ marginTop: '1rem', textAlign: 'center' }}>
-          No account? <Link to="/register">Register</Link>
-        </p>
+        </div>
       </div>
     </div>
   );

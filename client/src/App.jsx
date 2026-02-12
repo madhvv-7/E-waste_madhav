@@ -3,7 +3,7 @@ import { useAuth } from './AuthContext';
 import ProtectedRoute from './ProtectedRoute';
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
-import Register from './pages/Register';
+import Register from './pages/RegisterClean';
 import ContactAdmin from './pages/ContactAdmin';
 import UserDashboard from './pages/UserDashboard';
 import AgentDashboard from './pages/AgentDashboard';

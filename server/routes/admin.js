@@ -288,6 +288,11 @@ router.put('/deactivate-account/:id', protect, authorize('admin'), async (req, r
       return res.status(404).json({ message: 'User not found' });
     }
 
+    // Prevent admin from deactivating their own account
+    if (req.user && String(req.user._id) === String(user._id)) {
+      return res.status(400).json({ message: 'You cannot deactivate your own account' });
+    }
+
     // Can only deactivate active accounts
     if (user.status !== 'active') {
       return res.status(400).json({ message: 'Only active accounts can be deactivated' });
@@ -338,6 +343,39 @@ router.put('/reactivate-account/:id', protect, authorize('admin'), async (req, r
       message: 'Account reactivated successfully',
       user: userData,
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+/**
+ * DELETE /api/admin/delete-account/:id - Permanently delete a user account
+ * Restrictions:
+ * - Only admins can call this endpoint
+ * - Admin accounts cannot be deleted under any condition
+ * - Admins cannot delete their own account
+ */
+router.delete('/delete-account/:id', protect, authorize('admin'), async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Prevent deletion of any admin account
+    if (user.role === 'admin') {
+      return res.status(403).json({ message: 'Admin accounts cannot be deleted' });
+    }
+
+    // Prevent admin from deleting their own account
+    if (req.user && String(req.user._id) === String(user._id)) {
+      return res.status(400).json({ message: 'You cannot delete your own account' });
+    }
+
+    // Permanently remove user
+    await User.findByIdAndDelete(req.params.id);
+
+    res.json({ message: 'User account permanently deleted' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

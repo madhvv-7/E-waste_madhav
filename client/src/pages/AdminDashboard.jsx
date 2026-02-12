@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useAuth } from '../AuthContext';
 import api from '../api';
 
 function AdminDashboard() {
+  const { user: currentUser } = useAuth();
   const [requests, setRequests] = useState([]);
   const [reports, setReports] = useState(null);
   const [allUsers, setAllUsers] = useState([]);
@@ -19,6 +21,10 @@ function AdminDashboard() {
   const [deactivating, setDeactivating] = useState('');
   const [reactivating, setReactivating] = useState('');
   const [appealProcessing, setAppealProcessing] = useState(''); // id of appeal being processed
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   // Fetch active agents for dropdown
   const fetchActiveAgents = async () => {
@@ -286,12 +292,26 @@ function AdminDashboard() {
     phone: '',
     address: '',
     password: '',
+    materials: [], // array of selected materials
   });
+  const [showPasswordAdmin, setShowPasswordAdmin] = useState(false);
+  const [showConfirmPasswordAdmin, setShowConfirmPasswordAdmin] = useState(false);
+  const [newRecyclerErrors, setNewRecyclerErrors] = useState({});
   const [creatingRecycler, setCreatingRecycler] = useState(false);
 
   const handleNewRecyclerChange = (e) => {
-    const { name, value } = e.target;
-    setNewRecycler((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    if (type === 'checkbox') {
+      // materials checkboxes
+      setNewRecycler((prev) => {
+        const materials = new Set(prev.materials || []);
+        if (checked) materials.add(value);
+        else materials.delete(value);
+        return { ...prev, materials: Array.from(materials) };
+      });
+    } else {
+      setNewRecycler((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleCreateRecycler = async (e) => {
@@ -301,14 +321,31 @@ function AdminDashboard() {
     setCreatingRecycler(true);
     try {
       // Create recycler via public register endpoint (role fixed to 'recycler')
+      // Frontend validation
+      const errs = {};
+      if (!newRecycler.name || newRecycler.name.trim() === '') errs.name = 'Name is required';
+      if (!newRecycler.email || newRecycler.email.trim() === '') errs.email = 'Email is required';
+      if (!newRecycler.password) errs.password = 'Password is required';
+      if (!newRecycler.password || newRecycler.password.length < 8) errs.password = 'Password must be at least 8 characters';
+      if (!newRecycler.confirmPassword) errs.confirmPassword = 'Please confirm password';
+      if (newRecycler.password !== newRecycler.confirmPassword) errs.confirmPassword = 'Passwords do not match';
+      if (newRecycler.phone && !/^[0-9]{10}$/.test(newRecycler.phone)) errs.phone = 'Phone must be 10 digits';
+      setNewRecyclerErrors(errs);
+      if (Object.keys(errs).length > 0) {
+        setError('Please fix the form errors and try again.');
+        setCreatingRecycler(false);
+        return;
+      }
+
       const payload = {
         name: newRecycler.name,
         email: newRecycler.email,
         password: newRecycler.password,
-        confirmPassword: newRecycler.password,
+        confirmPassword: newRecycler.confirmPassword,
         role: 'recycler',
         address: newRecycler.address,
         phone: newRecycler.phone,
+        materials: Array.isArray(newRecycler.materials) ? newRecycler.materials.join(',') : (newRecycler.materials || '').trim(),
       };
 
       const res = await api.post('/auth/register', payload);
@@ -359,6 +396,7 @@ function AdminDashboard() {
     const isProcessing = approving === user._id || rejecting === user._id || 
                         deactivating === user._id || reactivating === user._id;
     const buttons = [];
+    const isSelf = currentUser && currentUser._id === user._id;
 
     // Agent and Recycler: Show approve/reject/deactivate/reactivate based on status
     if (user.role === 'agent' || user.role === 'recycler') {
@@ -409,19 +447,34 @@ function AdminDashboard() {
           </button>
         );
       }
+      // For non-admin roles allow delete (cannot delete self)
+      buttons.push(
+        <button
+          key="delete"
+          onClick={() => openDeleteModal(user)}
+          className="btn btn-danger"
+          disabled={isProcessing}
+          style={{ marginLeft: '0.5rem' }}
+        >
+          Delete
+        </button>
+      );
     } else if (user.role === 'user' || user.role === 'admin') {
-      // User and Admin: Only show deactivate/reactivate (no approval actions)
+      // User and Admin: show deactivate/reactivate, but prevent self-deactivation and never show delete for admins
       if (user.status === 'active') {
-        buttons.push(
-          <button
-            key="deactivate"
-            onClick={() => handleDeactivateAccount(user._id)}
-            className="btn btn-warning"
-            disabled={isProcessing}
-          >
-            {deactivating === user._id ? 'Deactivating...' : 'Deactivate'}
-          </button>
-        );
+        // Prevent admin from deactivating their own account
+        if (!isSelf) {
+          buttons.push(
+            <button
+              key="deactivate"
+              onClick={() => handleDeactivateAccount(user._id)}
+              className="btn btn-warning"
+              disabled={isProcessing}
+            >
+              {deactivating === user._id ? 'Deactivating...' : 'Deactivate'}
+            </button>
+          );
+        }
       } else if (user.status === 'deactivated') {
         buttons.push(
           <button
@@ -434,9 +487,51 @@ function AdminDashboard() {
           </button>
         );
       }
+      // Show delete for non-admin users only (and not self)
+      if (user.role !== 'admin' && !isSelf) {
+        buttons.push(
+          <button
+            key="delete"
+            onClick={() => openDeleteModal(user)}
+            className="btn btn-danger"
+            disabled={isProcessing}
+            style={{ marginLeft: '0.5rem' }}
+          >
+            Delete
+          </button>
+        );
+      }
     }
 
     return buttons.length > 0 ? buttons : <span style={{ color: '#999' }}>No actions</span>;
+  };
+
+  const openDeleteModal = (user) => {
+    setDeleteTarget(user);
+    setDeleteError('');
+    setShowDeleteModal(true);
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setDeleteTarget(null);
+    setDeleteError('');
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
+    setDeleteError('');
+    try {
+      await api.delete(`/admin/delete-account/${deleteTarget._id}`);
+      setSuccess('Account deleted successfully');
+      closeDeleteModal();
+      await fetchData();
+    } catch (err) {
+      setDeleteError(err.response?.data?.message || 'Failed to delete account');
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   const getRoleBadgeClass = (role) => {
@@ -572,46 +667,138 @@ function AdminDashboard() {
             )}
           </div>
           
+          {/* Delete confirmation modal */}
+          {showDeleteModal && deleteTarget && (
+            <div className="modal-backdrop" style={{
+              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+              backgroundColor: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              zIndex: 2000
+            }}>
+              <div className="card" style={{ maxWidth: 540, width: '100%', padding: '1rem' }}>
+                <h4>Are you sure?</h4>
+                <p>This action cannot be undone. Permanently delete account for <strong>{deleteTarget.name} ({deleteTarget.email})</strong>?</p>
+                {deleteError && <div className="alert alert-danger">{deleteError}</div>}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                  <button className="btn btn-secondary" onClick={closeDeleteModal} disabled={deleteLoading}>Cancel</button>
+                  <button className="btn btn-danger" onClick={handleConfirmDelete} disabled={deleteLoading}>
+                    {deleteLoading ? 'Deleting...' : 'Delete permanently'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Add Recycler (admin only) */}
           <div className="card">
             <h3>Add Recycler (admin)</h3>
             <p style={{ fontSize: '0.875rem', color: '#666', marginBottom: '1rem' }}>
               Create a recycler account manually. Recycler accounts created here are activated immediately.
             </p>
-            <form onSubmit={handleCreateRecycler} style={{ maxWidth: 600 }}>
-              <div className="form-group">
-                <label>
-                  Name
-                  <input type="text" name="name" value={newRecycler.name} onChange={handleNewRecyclerChange} required />
-                </label>
+            <form onSubmit={handleCreateRecycler} style={{ maxWidth: 800 }}>
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <label className="form-label">Recycler Name (facility/company)</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={newRecycler.name}
+                    onChange={handleNewRecyclerChange}
+                    required
+                    className="form-control rounded-pill"
+                  />
+                </div>
+
+                <div className="col-md-6">
+                  <label className="form-label">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={newRecycler.email}
+                    onChange={handleNewRecyclerChange}
+                    required
+                    className="form-control rounded-pill"
+                  />
+                </div>
+
+                <div className="col-md-6">
+                  <label className="form-label">Phone (10 digits)</label>
+                  <input
+                    type="text"
+                    name="phone"
+                    value={newRecycler.phone}
+                    onChange={handleNewRecyclerChange}
+                    placeholder="1234567890"
+                    maxLength={10}
+                    className="form-control rounded-pill"
+                  />
+                </div>
+
+                <div className="col-md-6">
+                  <label className="form-label">Password</label>
+                  <div className="input-group">
+                    <input
+                      type={showPasswordAdmin ? 'text' : 'password'}
+                      name="password"
+                      value={newRecycler.password}
+                      onChange={handleNewRecyclerChange}
+                      required
+                      className="form-control rounded-pill"
+                    />
+                    <button type="button" className="btn btn-outline-secondary" onClick={() => setShowPasswordAdmin(!showPasswordAdmin)}>
+                      {showPasswordAdmin ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
+                  {newRecyclerErrors.password && <div className="form-text text-danger">{newRecyclerErrors.password}</div>}
+                </div>
+
+                <div className="col-md-6">
+                  <label className="form-label">Confirm Password</label>
+                  <div className="input-group">
+                    <input
+                      type={showConfirmPasswordAdmin ? 'text' : 'password'}
+                      name="confirmPassword"
+                      value={newRecycler.confirmPassword || ''}
+                      onChange={handleNewRecyclerChange}
+                      required
+                      className="form-control rounded-pill"
+                    />
+                    <button type="button" className="btn btn-outline-secondary" onClick={() => setShowConfirmPasswordAdmin(!showConfirmPasswordAdmin)}>
+                      {showConfirmPasswordAdmin ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
+                  {newRecyclerErrors.confirmPassword && <div className="form-text text-danger">{newRecyclerErrors.confirmPassword}</div>}
+                </div>
+
+                <div className="col-12">
+                  <label className="form-label">Full Address</label>
+                  <textarea
+                    name="address"
+                    value={newRecycler.address}
+                    onChange={handleNewRecyclerChange}
+                    rows={2}
+                    className="form-control rounded"
+                  />
+                </div>
+
+                <div className="col-12">
+                  <label className="form-label">Materials Accepted</label>
+                  <input
+                    type="text"
+                    name="materials"
+                    value={newRecycler.materials || ''}
+                    onChange={(e) => setNewRecycler((p) => ({ ...p, materials: e.target.value }))}
+                    className="form-control rounded-pill"
+                    placeholder="e.g., Laptop, Mobile, Battery"
+                  />
+                  <div className="form-text">Enter materials accepted (comma-separated).</div>
+                </div>
+
+                <div className="col-12 d-grid">
+                  <button type="submit" className="btn btn-success rounded-pill" disabled={creatingRecycler}>
+                    {creatingRecycler ? 'Creating...' : 'Create Recycler'}
+                  </button>
+                </div>
               </div>
-              <div className="form-group">
-                <label>
-                  Email
-                  <input type="email" name="email" value={newRecycler.email} onChange={handleNewRecyclerChange} required />
-                </label>
-              </div>
-              <div className="form-group">
-                <label>
-                  Phone
-                  <input type="text" name="phone" value={newRecycler.phone} onChange={handleNewRecyclerChange} />
-                </label>
-              </div>
-              <div className="form-group">
-                <label>
-                  Address
-                  <input type="text" name="address" value={newRecycler.address} onChange={handleNewRecyclerChange} />
-                </label>
-              </div>
-              <div className="form-group">
-                <label>
-                  Password
-                  <input type="password" name="password" value={newRecycler.password} onChange={handleNewRecyclerChange} required />
-                </label>
-              </div>
-              <button type="submit" className="btn btn-primary" disabled={creatingRecycler}>
-                {creatingRecycler ? 'Creating...' : 'Create Recycler'}
-              </button>
             </form>
           </div>
           
