@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api, { setAuthToken } from './api';
 
 const AuthContext = createContext(null);
@@ -7,6 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const savedToken = localStorage.getItem('token');
@@ -35,6 +37,13 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setAuthToken(null);
+    // Redirect to home to avoid landing on protected routes
+    try {
+      navigate('/', { replace: true });
+    } catch (err) {
+      // navigate may not be available in some contexts; ignore if so
+      // but generally it will redirect to home
+    }
   };
 
   const register = async (values) => {

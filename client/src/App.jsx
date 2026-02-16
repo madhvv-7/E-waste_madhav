@@ -1,56 +1,15 @@
-import { Link, Route, Routes } from 'react-router-dom';
+import { Link, Route, Routes, Navigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import ProtectedRoute from './ProtectedRoute';
 import Navbar from './components/Navbar';
-import Login from './pages/Login';
+// Login page removed - login UI now on Home
 import Register from './pages/RegisterClean';
 import ContactAdmin from './pages/ContactAdmin';
 import UserDashboard from './pages/UserDashboard';
 import AgentDashboard from './pages/AgentDashboard';
 import RecyclerDashboard from './pages/RecyclerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
-
-function Home() {
-  const { user } = useAuth();
-
-  return (
-    <div className="home-container">
-      <h1>E-Waste Collection & Recycling Management System</h1>
-      {user ? (
-        <>
-          <p>
-            Welcome, <strong>{user.name}</strong>! Access your dashboard below.
-          </p>
-          <div className="dashboard-links">
-            {user.role === 'user' && (
-              <Link to="/user/dashboard">User Dashboard</Link>
-            )}
-            {user.role === 'agent' && (
-              <Link to="/agent/dashboard">Agent Dashboard</Link>
-            )}
-            {user.role === 'recycler' && (
-              <Link to="/recycler/dashboard">Recycler Dashboard</Link>
-            )}
-            {user.role === 'admin' && (
-              <Link to="/admin/dashboard">Admin Dashboard</Link>
-            )}
-          </div>
-        </>
-      ) : (
-        <>
-          <p>
-            A centralized web application connecting Users, Collection Agents,
-            Recyclers, and Admin for responsible e-waste management.
-          </p>
-          <div className="dashboard-links">
-            <Link to="/login">Login</Link>
-            <Link to="/register">Register</Link>
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
+import Home from './pages/Home';
 
 function App() {
   return (
@@ -58,7 +17,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Navigate to="/" replace />} />
         <Route path="/register" element={<Register />} />
         <Route path="/contact-admin" element={<ContactAdmin />} />
         <Route
