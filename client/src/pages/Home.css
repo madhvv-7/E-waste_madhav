@@ -1,0 +1,86 @@
+.hero-section {
+  background: linear-gradient(180deg, #f6fbf8 0%, #ffffff 100%);
+  min-height: 72vh;
+  display: flex;
+  align-items: center;
+}
+.hero-inner {
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+}
+.hero-headline {
+  color: #063e26;
+  font-weight: 700;
+  line-height: 1.03;
+  letter-spacing: -0.02em;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+.hero-sub {
+  color: #55606a;
+  max-width: 44rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+.login-accent {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+.bg-accent {
+  position: absolute;
+  inset: -12%;
+  background: radial-gradient(closest-side, rgba(42,163,138,0.08), rgba(11,102,35,0.02));
+  filter: blur(28px);
+  border-radius: 20px;
+  z-index: 0;
+}
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(6,62,38,0.12);
+  padding: 1.5rem;
+  background: #fff;
+  position: relative;
+  z-index: 2;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.login-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 40px rgba(6,62,38,0.16);
+}
+.form-control:focus {
+  border-color: #0b6623;
+  box-shadow: 0 0 0 0.12rem rgba(11,102,35,0.08);
+}
+.btn-gradient {
+  background: linear-gradient(90deg,#0b6623,#2aa38a);
+  border: none;
+  color: white;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.btn-gradient:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(11,102,35,0.18);
+}
+.fade-in {
+  animation: fadeInUp .6s ease both;
+}
+.slide-in {
+  animation: slideInRight .6s ease both;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(18px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@media (max-width: 767px) {
+  .hero-inner { flex-direction: column-reverse; gap: 1.5rem; }
+  .hero-headline { font-size: 1.6rem; }
+}

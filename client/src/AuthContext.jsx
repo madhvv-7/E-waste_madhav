@@ -62,6 +62,7 @@ export const AuthProvider = ({ children }) => {
   const loginRequest = async (values) => {
     const res = await api.post('/auth/login', values);
     login(res.data);
+    return res.data;
   };
 
   return (
