@@ -10,6 +10,8 @@ import AgentDashboard from './pages/AgentDashboard';
 import RecyclerDashboard from './pages/RecyclerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import Home from './pages/Home';
+import About from './pages/About';
+import Explore from './pages/Explore';
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/explore" element={<Explore />} />
         <Route path="/login" element={<Navigate to="/" replace />} />
         <Route path="/register" element={<Register />} />
         <Route path="/contact-admin" element={<ContactAdmin />} />

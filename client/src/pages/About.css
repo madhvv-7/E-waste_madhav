@@ -1,0 +1,294 @@
+/* About Hero Section */
+.about-hero-section {
+  background: linear-gradient(180deg, #f6fbf8 0%, #ffffff 100%);
+  padding: 5rem 0;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+}
+
+.about-hero-inner {
+  display: flex;
+  gap: 4rem;
+  align-items: center;
+}
+
+.about-hero-text {
+  flex: 1;
+}
+
+.about-headline {
+  color: #063e26;
+  font-weight: 700;
+  font-size: 2.8rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+}
+
+.about-sub {
+  color: #55606a;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  max-width: 500px;
+}
+
+.about-hero-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+/* Image Placeholders */
+.image-placeholder {
+  background: linear-gradient(135deg, #f0f7f4 0%, #e8f5e9 100%);
+  border: 2px dashed #a5d6a7;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2e7d32;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.image-placeholder.large {
+  width: 100%;
+  max-width: 450px;
+  height: 320px;
+}
+
+.image-placeholder.medium {
+  width: 100%;
+  max-width: 400px;
+  height: 280px;
+}
+
+.image-placeholder.wide {
+  width: 100%;
+  height: 300px;
+}
+
+.image-placeholder.small {
+  width: 100%;
+  height: 180px;
+}
+
+/* Mission Section */
+.mission-section {
+  padding: 5rem 0;
+  background: #ffffff;
+}
+
+.mission-inner {
+  display: flex;
+  gap: 4rem;
+  align-items: center;
+}
+
+.mission-image {
+  flex: 1;
+}
+
+.mission-text {
+  flex: 1;
+}
+
+.section-title {
+  color: #0b6623;
+  font-weight: 700;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-description {
+  color: #55606a;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+/* How We Work Section */
+.how-we-work-section {
+  padding: 5rem 0;
+  background: #f8faf9;
+}
+
+.work-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2rem;
+  height: 100%;
+  box-shadow: 0 8px 24px rgba(6, 62, 38, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-align: center;
+}
+
+.work-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(6, 62, 38, 0.12);
+}
+
+.card-icon {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  font-size: 1.5rem;
+}
+
+.work-card h5 {
+  color: #0b6623;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.work-card p {
+  color: #55606a;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Vision Section */
+.vision-section {
+  padding: 5rem 0;
+  background: #ffffff;
+}
+
+.vision-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.vision-text {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.vision-image {
+  width: 100%;
+}
+
+.impact-stats {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #0b6623;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.9rem;
+  color: #55606a;
+  margin-top: 0.25rem;
+}
+
+/* CTA Section */
+.cta-section {
+  padding: 5rem 0;
+  background: linear-gradient(135deg, #0b6623 0%, #2aa38a 100%);
+}
+
+.cta-title {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+}
+
+.cta-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Footer */
+.about-footer {
+  padding: 2rem 0;
+  background: #f1f6f3;
+}
+
+/* Animations */
+.fade-in {
+  animation: fadeInUp 0.6s ease both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+  .about-hero-inner,
+  .mission-inner {
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .about-headline {
+    font-size: 2.2rem;
+  }
+
+  .mission-inner {
+    flex-direction: column-reverse;
+  }
+
+  .image-placeholder.large,
+  .image-placeholder.medium {
+    max-width: 100%;
+    height: 250px;
+  }
+}
+
+@media (max-width: 767px) {
+  .about-hero-section {
+    padding: 3rem 0;
+  }
+
+  .about-headline {
+    font-size: 1.8rem;
+  }
+
+  .section-title {
+    font-size: 1.6rem;
+  }
+
+  .impact-stats {
+    gap: 1.5rem;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+  }
+
+  .cta-title {
+    font-size: 1.8rem;
+  }
+}

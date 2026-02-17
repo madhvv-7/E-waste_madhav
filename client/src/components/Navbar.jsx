@@ -58,14 +58,14 @@ function Navbar() {
                     Home
                   </Link>
                 </li>
-                {/* <li className="nav-item">
-                  <Link className="nav-link text-white" to="/#how-it-works">
-                    How It Works
-                  </Link>
-                </li> */}
                 <li className="nav-item">
-                  <Link className="nav-link text-white" to="/#about">
+                  <Link className="nav-link text-white" to="/about">
                     About
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link text-white" to="/explore">
+                    Explore
                   </Link>
                 </li>
                 <li className="nav-item">

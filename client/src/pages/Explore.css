@@ -1,0 +1,345 @@
+/* Explore Hero Section */
+.explore-hero-section {
+  background: linear-gradient(180deg, #f6fbf8 0%, #ffffff 100%);
+  padding: 5rem 0 3rem;
+}
+
+.explore-hero-content {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 3rem;
+}
+
+.explore-headline {
+  color: #063e26;
+  font-weight: 700;
+  font-size: 2.8rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+}
+
+.explore-sub {
+  color: #55606a;
+  font-size: 1.15rem;
+  line-height: 1.7;
+}
+
+.explore-hero-image {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Image Placeholders */
+.image-placeholder {
+  background: linear-gradient(135deg, #f0f7f4 0%, #e8f5e9 100%);
+  border: 2px dashed #a5d6a7;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2e7d32;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.image-placeholder.hero-wide {
+  width: 100%;
+  height: 350px;
+}
+
+.image-placeholder.process-wide {
+  width: 100%;
+  height: 200px;
+}
+
+/* Section Common Styles */
+.section-title {
+  color: #0b6623;
+  font-weight: 700;
+  font-size: 2rem;
+}
+
+.section-subtitle {
+  color: #55606a;
+  font-size: 1.05rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Features Section */
+.features-section {
+  padding: 5rem 0;
+  background: #ffffff;
+}
+
+.feature-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  height: 100%;
+  box-shadow: 0 8px 24px rgba(6, 62, 38, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-align: center;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(6, 62, 38, 0.12);
+}
+
+.feature-image-placeholder {
+  background: linear-gradient(135deg, #f0f7f4 0%, #e8f5e9 100%);
+  border: 2px dashed #a5d6a7;
+  border-radius: 12px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2e7d32;
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.feature-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 1.3rem;
+}
+
+.feature-card h5 {
+  color: #0b6623;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+}
+
+.feature-card p {
+  color: #55606a;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Process Section */
+.process-section {
+  padding: 5rem 0;
+  background: #f8faf9;
+}
+
+.process-visual {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.process-step {
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.step-number {
+  width: 45px;
+  height: 45px;
+  background: linear-gradient(135deg, #0b6623 0%, #2aa38a 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.process-step h6 {
+  color: #0b6623;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.process-step p {
+  color: #55606a;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Statistics Section */
+.stats-section {
+  padding: 5rem 0;
+  background: #ffffff;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #f6fbf8 0%, #e8f5e9 100%);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.stat-card .stat-number {
+  display: block;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #0b6623;
+  line-height: 1.2;
+}
+
+.stat-card .stat-label {
+  display: block;
+  font-size: 0.9rem;
+  color: #55606a;
+  margin-top: 0.25rem;
+}
+
+/* Roles Section */
+.roles-section {
+  padding: 5rem 0;
+  background: #f8faf9;
+}
+
+.role-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  height: 100%;
+  box-shadow: 0 8px 24px rgba(6, 62, 38, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.role-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(6, 62, 38, 0.12);
+}
+
+.role-image-placeholder {
+  background: linear-gradient(135deg, #f0f7f4 0%, #e8f5e9 100%);
+  border: 2px dashed #a5d6a7;
+  border-radius: 12px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2e7d32;
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.role-card h5 {
+  color: #0b6623;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.role-card p {
+  color: #55606a;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* CTA Section */
+.explore-cta-section {
+  padding: 5rem 0;
+  background: linear-gradient(135deg, #0b6623 0%, #2aa38a 100%);
+}
+
+.explore-cta-section .cta-title {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+}
+
+.explore-cta-section .cta-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Footer */
+.explore-footer {
+  padding: 2rem 0;
+  background: #f1f6f3;
+}
+
+/* Animations */
+.fade-in {
+  animation: fadeInUp 0.6s ease both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+  .explore-headline {
+    font-size: 2.2rem;
+  }
+
+  .image-placeholder.hero-wide {
+    height: 280px;
+  }
+}
+
+@media (max-width: 767px) {
+  .explore-hero-section {
+    padding: 3rem 0 2rem;
+  }
+
+  .explore-headline {
+    font-size: 1.8rem;
+  }
+
+  .section-title {
+    font-size: 1.6rem;
+  }
+
+  .image-placeholder.hero-wide {
+    height: 200px;
+  }
+
+  .image-placeholder.process-wide {
+    height: 150px;
+  }
+
+  .stat-card .stat-number {
+    font-size: 1.8rem;
+  }
+
+  .explore-cta-section .cta-title {
+    font-size: 1.8rem;
+  }
+
+  .process-step {
+    padding: 1rem;
+  }
+}

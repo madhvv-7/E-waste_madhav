@@ -1,3 +1,4 @@
+/* Hero Section - Unchanged */
 .hero-section {
   background: linear-gradient(180deg, #f6fbf8 0%, #ffffff 100%);
   min-height: 72vh;
@@ -66,6 +67,8 @@
   transform: translateY(-3px);
   box-shadow: 0 10px 30px rgba(11,102,35,0.18);
 }
+
+/* Animations */
 .fade-in {
   animation: fadeInUp .6s ease both;
 }
@@ -80,7 +83,267 @@
   from { opacity: 0; transform: translateX(18px); }
   to { opacity: 1; transform: translateX(0); }
 }
+
+/* Common Section Styles */
+.home-section {
+  padding: 5rem 0;
+}
+
+.home-section-title {
+  color: #0b6623;
+  font-weight: 700;
+  font-size: 2.2rem;
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+
+.home-section-subtitle {
+  color: #55606a;
+  font-size: 1.1rem;
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 3rem;
+}
+
+/* How It Works Section */
+.how-it-works-section {
+  background: #ffffff;
+}
+
+.home-work-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2rem;
+  height: 100%;
+  box-shadow: 0 8px 24px rgba(6, 62, 38, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.home-work-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(6, 62, 38, 0.12);
+}
+
+.home-card-image-placeholder {
+  width: 100%;
+  height: 120px;
+  background: linear-gradient(135deg, #f0f7f4 0%, #e8f5e9 100%);
+  border: 2px dashed #a5d6a7;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  font-size: 2.5rem;
+}
+
+.home-card-icon {
+  width: 45px;
+  height: 45px;
+  background: linear-gradient(135deg, #0b6623 0%, #2aa38a 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.home-work-card h5 {
+  color: #0b6623;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  font-size: 1.15rem;
+}
+
+.home-work-card p {
+  color: #55606a;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Who Can Use Section */
+.who-section {
+  background: #f8faf9;
+}
+
+.home-role-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  height: 100%;
+  box-shadow: 0 8px 24px rgba(6, 62, 38, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-align: center;
+}
+
+.home-role-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(6, 62, 38, 0.12);
+}
+
+.home-role-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  font-size: 2rem;
+}
+
+.home-role-card h5 {
+  color: #0b6623;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.home-role-card p {
+  color: #55606a;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Info Section - Two Column */
+.home-info-section {
+  background: #ffffff;
+}
+
+.home-info-inner {
+  display: flex;
+  gap: 4rem;
+  align-items: center;
+}
+
+.home-info-text {
+  flex: 1;
+}
+
+.home-info-text .home-section-title {
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+.home-info-description {
+  color: #55606a;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.home-info-stats {
+  display: flex;
+  gap: 2rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.home-info-stat {
+  text-align: center;
+}
+
+.home-info-stat .stat-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0b6623;
+  line-height: 1.2;
+}
+
+.home-info-stat .stat-label {
+  display: block;
+  font-size: 0.85rem;
+  color: #55606a;
+  margin-top: 0.25rem;
+}
+
+.home-info-image {
+  flex: 1;
+}
+
+.home-large-image-placeholder {
+  width: 100%;
+  height: 320px;
+  background: linear-gradient(135deg, #f0f7f4 0%, #e8f5e9 100%);
+  border: 2px dashed #a5d6a7;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2e7d32;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+/* Footer */
+.home-footer {
+  padding: 2rem 0;
+  background: #f1f6f3;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+  .home-info-inner {
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .home-info-text .home-section-title {
+    text-align: center;
+  }
+
+  .home-info-stats {
+    justify-content: center;
+  }
+
+  .home-large-image-placeholder {
+    height: 250px;
+  }
+}
+
 @media (max-width: 767px) {
   .hero-inner { flex-direction: column-reverse; gap: 1.5rem; }
   .hero-headline { font-size: 1.6rem; }
+
+  .home-section {
+    padding: 3.5rem 0;
+  }
+
+  .home-section-title {
+    font-size: 1.8rem;
+  }
+
+  .home-section-subtitle {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .home-card-image-placeholder {
+    height: 100px;
+  }
+
+  .home-role-icon {
+    width: 70px;
+    height: 70px;
+    font-size: 1.6rem;
+  }
+
+  .home-info-stat .stat-number {
+    font-size: 1.6rem;
+  }
+
+  .home-large-image-placeholder {
+    height: 200px;
+  }
 }

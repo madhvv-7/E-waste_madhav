@@ -572,11 +572,23 @@ function AdminDashboard() {
                 <div className="card mb-3">
                   <div className="card-body">
                     <h3>Overview</h3>
-                    <div className="d-flex gap-3 flex-wrap">
-                      <div className="card p-3"><h4>{reports.totalRequests}</h4><p>Total Requests</p></div>
-                      <div className="card p-3"><h4>{reports.totalUsers}</h4><p>Total Users</p></div>
-                      <div className="card p-3"><h4>{reports.totalAgents}</h4><p>Total Agents</p></div>
-                      <div className="card p-3"><h4>{reports.totalRecyclers}</h4><p>Total Recyclers</p></div>
+                    <div className="admin-stats-grid">
+                      <div className="admin-stat-card">
+                        <h4>{reports.totalRequests}</h4>
+                        <p>Total Requests</p>
+                      </div>
+                      <div className="admin-stat-card">
+                        <h4>{reports.totalUsers}</h4>
+                        <p>Total Users</p>
+                      </div>
+                      <div className="admin-stat-card">
+                        <h4>{reports.totalAgents}</h4>
+                        <p>Total Agents</p>
+                      </div>
+                      <div className="admin-stat-card">
+                        <h4>{reports.totalRecyclers}</h4>
+                        <p>Total Recyclers</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -727,7 +739,26 @@ function AdminDashboard() {
               <div className="card mb-3">
                 <div className="card-body">
                   <h3>System Reports</h3>
-                  {reports && (<div className="row"><div className="col-md-3"><div className="card p-3"><h4>{reports.totalRequests}</h4><p>Total Requests</p></div></div><div className="col-md-3"><div className="card p-3"><h4>{reports.totalUsers}</h4><p>Total Users</p></div></div><div className="col-md-3"><div className="card p-3"><h4>{reports.totalAgents}</h4><p>Total Agents</p></div></div><div className="col-md-3"><div className="card p-3"><h4>{reports.totalRecyclers}</h4><p>Total Recyclers</p></div></div></div>)}
+                  {reports && (
+                    <div className="admin-stats-grid">
+                      <div className="admin-stat-card">
+                        <h4>{reports.totalRequests}</h4>
+                        <p>Total Requests</p>
+                      </div>
+                      <div className="admin-stat-card">
+                        <h4>{reports.totalUsers}</h4>
+                        <p>Total Users</p>
+                      </div>
+                      <div className="admin-stat-card">
+                        <h4>{reports.totalAgents}</h4>
+                        <p>Total Agents</p>
+                      </div>
+                      <div className="admin-stat-card">
+                        <h4>{reports.totalRecyclers}</h4>
+                        <p>Total Recyclers</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

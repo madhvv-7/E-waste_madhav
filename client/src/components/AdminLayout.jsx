@@ -15,39 +15,41 @@ export default function AdminLayout({ children, activeTab, setActiveTab }) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="d-flex admin-layout" style={{ minHeight: '80vh' }}>
-      <aside className={`admin-sidebar bg-light border-end ${collapsed ? 'collapsed' : ''}`}>
-        <div className="d-flex align-items-center justify-content-between p-3">
-          <div className="d-flex align-items-center gap-2">
-            <div className="sidebar-brand" aria-hidden>
-              🗂
-            </div>
-            <h5 className="mb-0 sidebar-title">{!collapsed && 'Admin'}</h5>
+    <div className="d-flex admin-layout">
+      <aside className={`admin-sidebar ${collapsed ? 'collapsed' : ''}`}>
+        <div className="sidebar-header">
+          <div className="sidebar-header-content">
+            <span className="sidebar-brand">🗂</span>
+            {!collapsed && <h5 className="mb-0 sidebar-title">Admin</h5>}
           </div>
-          <button className="btn btn-sm btn-outline-secondary" onClick={() => setCollapsed((c) => !c)} aria-label="Toggle sidebar">
+          <button 
+            className="btn btn-sm btn-outline-secondary sidebar-toggle" 
+            onClick={() => setCollapsed((c) => !c)} 
+            aria-label="Toggle sidebar"
+          >
             {collapsed ? '☰' : '✕'}
           </button>
         </div>
-        <nav className="nav flex-column px-2">
+        <nav className="nav flex-column">
           {navItems.map((item) => {
             const isActive = activeTab === item.id;
             return (
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`nav-link btn btn-ghost d-flex align-items-center w-100 mb-1 ${isActive ? 'active' : ''}`}
+                className={`nav-link btn btn-ghost w-100 ${isActive ? 'active' : ''}`}
                 title={item.label}
                 aria-current={isActive ? 'page' : undefined}
               >
-                <span className="nav-icon" style={{ width: 28, textAlign: 'center' }}>{item.icon}</span>
-                <span className="nav-label ms-2">{item.label}</span>
+                <span className="nav-icon">{item.icon}</span>
+                {!collapsed && <span className="nav-label">{item.label}</span>}
               </button>
             );
           })}
         </nav>
       </aside>
 
-      <main className="flex-grow-1 p-4 admin-main">
+      <main className="flex-grow-1 admin-main">
         {children}
       </main>
     </div>
