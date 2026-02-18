@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import './Home.css';
 
@@ -83,7 +83,23 @@ export default function Home() {
               <div className="login-card">
                 <h5 className="mb-3" style={{ color: '#0b6623' }}>Sign in to your account</h5>
                 <form onSubmit={handleLoginSubmit}>
-                  {loginError && <div className="alert alert-danger">{loginError}</div>}
+                  {loginError && (
+                    <div className="alert alert-danger">
+                      {loginError}
+                      {(loginError.toLowerCase().includes('deactivated') || 
+                        loginError.toLowerCase().includes('rejected') ||
+                        loginError.toLowerCase().includes('pending')) && (
+                        <div className="mt-2">
+                          <Link 
+                            to={`/contact-admin?email=${encodeURIComponent(loginForm.email)}`}
+                            className="alert-link"
+                          >
+                            Contact Administrator
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   <div className="mb-3">
                     <label className="form-label small">Email</label>
                     <input name="email" value={loginForm.email} onChange={handleLoginChange} type="email" className="form-control rounded-pill" placeholder="you@example.com" />
