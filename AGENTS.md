@@ -15,6 +15,7 @@ npm install          # Install dependencies
 npm start            # Start server (port 5000)
 npm run dev          # Start with nodemon (hot reload)
 npm run seed         # Seed test users
+npm test             # Run Jest tests
 ```
 
 ### Client (React Frontend)
@@ -57,15 +58,21 @@ All routes prefixed with `/api`:
 - `/agent` - Collection agent operations (agent role)
 - `/recycler` - Recycler operations (recycler role)
 - `/admin` - Admin operations (admin role)
+- `/appeals` - Contact/appeal requests
+
+Health check: `GET /` returns `{ message: 'API is running' }`
 
 ### Data Models (server/models/)
 - `User.js` - Users with role field (user/agent/recycler/admin)
 - `PickupRequest.js` - E-waste pickup requests with status tracking
 - `EWasteItem.js` - E-waste item types and categories
 - `RecyclingRecord.js` - Recycling completion records
+- `Appeal.js` - User contact/appeal submissions
 
 ### Frontend Structure
 - `AuthContext.jsx` - Global auth state provider
 - `ProtectedRoute.jsx` - Route guard component
 - `pages/` - Role-specific dashboards (UserDashboard, AgentDashboard, RecyclerDashboard, AdminDashboard)
 - `components/Navbar.jsx` - Navigation component
+- `components/AdminLayout.jsx` - Admin page layout wrapper
+- UI styled with Bootstrap 5
