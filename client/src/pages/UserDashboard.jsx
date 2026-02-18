@@ -90,43 +90,42 @@ function UserDashboard() {
             {success && <div className="message message-success">{success}</div>}
             
             <form onSubmit={handleSubmit} className="pickup-form">
-              <div className="form-group">
-                <label>
-                  Pickup Address
-                  <input
-                    type="text"
-                    value={pickupAddress}
-                    onChange={(e) => setPickupAddress(e.target.value)}
-                    required
-                    placeholder="Enter your address"
-                  />
-                </label>
+              <div className="form-field">
+                <label className="field-label">Pickup Address</label>
+                <textarea
+                  value={pickupAddress}
+                  onChange={(e) => setPickupAddress(e.target.value)}
+                  required
+                  placeholder="Enter your full address"
+                  rows="3"
+                  className="field-textarea"
+                />
               </div>
-              <div className="form-group">
-                <label>
-                  Item Description
+              <div className="form-row">
+                <div className="form-field flex-2">
+                  <label className="field-label">Item Description</label>
                   <input
                     type="text"
                     value={itemDescription}
                     onChange={(e) => setItemDescription(e.target.value)}
                     required
                     placeholder="e.g., Old Laptop, Mobile Phone"
+                    className="field-input"
                   />
-                </label>
-              </div>
-              <div className="form-group">
-                <label>
-                  Quantity
+                </div>
+                <div className="form-field flex-1">
+                  <label className="field-label">Quantity</label>
                   <input
                     type="number"
                     min="1"
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
                     required
+                    className="field-input"
                   />
-                </label>
+                </div>
               </div>
-              <button type="submit" className="btn btn-primary" disabled={loading}>
+              <button type="submit" className="submit-btn" disabled={loading}>
                 {loading ? 'Submitting...' : 'Submit Request'}
               </button>
             </form>

@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import api from '../api';
+import './AgentDashboard.css';
 
 function AgentDashboard() {
+  const [activeTab, setActiveTab] = useState('overview');
   const [requests, setRequests] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -49,7 +51,6 @@ function AgentDashboard() {
     return `status-badge status-${status}`;
   };
 
-  // Calculate status counts from existing requests data
   const calculateStatusCounts = () => {
     const statusCounts = {
       Requested: 0,
@@ -69,108 +70,129 @@ function AgentDashboard() {
 
   const statusCounts = calculateStatusCounts();
 
+  const tabs = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'requests', label: 'Assigned Requests' },
+  ];
+
   return (
-    <div className="container">
-      <div className="card">
-        <h2>Collection Agent Dashboard</h2>
-        <p>View and manage your assigned pickup requests</p>
-        {error && <div className="message message-error">{error}</div>}
-        {success && <div className="message message-success">{success}</div>}
+    <div className="dashboard-page">
+      {/* Tab Navigation */}
+      <div className="dashboard-tabs">
+        <div className="dashboard-tabs-inner">
+          <nav className="tabs-nav">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+        </div>
       </div>
 
-      {/* Summary Cards Section */}
-      {!loading && (
-        <div className="card">
-          <h3>Request Summary</h3>
-          <div className="stats-grid">
-            <div className="stat-card">
-              <h3>{statusCounts.Requested}</h3>
-              <p>
-                <span className={getStatusBadgeClass('Requested')}>
-                  Requested
-                </span>
-              </p>
-            </div>
-            <div className="stat-card">
-              <h3>{statusCounts.Collected}</h3>
-              <p>
-                <span className={getStatusBadgeClass('Collected')}>
-                  Collected
-                </span>
-              </p>
-            </div>
-            <div className="stat-card">
-              <h3>{statusCounts.SentToRecycler}</h3>
-              <p>
-                <span className={getStatusBadgeClass('SentToRecycler')}>
-                  Sent to Recycler
-                </span>
-              </p>
-            </div>
-            <div className="stat-card">
-              <h3>{statusCounts.Recycled}</h3>
-              <p>
-                <span className={getStatusBadgeClass('Recycled')}>
-                  Recycled
-                </span>
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Content Area */}
+      <div className="dashboard-content">
+        {error && <div className="message message-error" style={{ marginBottom: '1rem' }}>{error}</div>}
+        {success && <div className="message message-success" style={{ marginBottom: '1rem' }}>{success}</div>}
 
-      <div className="card">
-        <h3>Assigned Pickup Requests</h3>
-        {loading ? (
-          <div className="loading">Loading requests...</div>
-        ) : requests.length === 0 ? (
-          <p>No assigned requests yet.</p>
-        ) : (
-          <div className="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Created At</th>
-                  <th>Address</th>
-                  <th>Item</th>
-                  <th>Quantity</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {requests.map((r) => (
-                  <tr key={r._id}>
-                    <td>{new Date(r.createdAt).toLocaleString()}</td>
-                    <td>{r.pickupAddress}</td>
-                    <td>{r.items?.[0]?.description || 'N/A'}</td>
-                    <td>{r.items?.[0]?.quantity || 0}</td>
-                    <td>
-                      <span className={getStatusBadgeClass(r.status)}>
-                        {r.status}
-                      </span>
-                    </td>
-                    <td>
-                      <button
-                        onClick={() => updateStatus(r._id, 'collect')}
-                        disabled={r.status !== 'Requested' || updating === r._id}
-                        className="btn btn-success"
-                        style={{ marginRight: '0.5rem' }}
-                      >
-                        {updating === r._id ? 'Updating...' : 'Mark Collected'}
-                      </button>
-                      <button
-                        onClick={() => updateStatus(r._id, 'send')}
-                        disabled={r.status !== 'Collected' || updating === r._id}
-                        className="btn btn-warning"
-                      >
-                        {updating === r._id ? 'Updating...' : 'Send to Recycler'}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {/* Overview Tab */}
+        {activeTab === 'overview' && (
+          <div className="content-card">
+            <h2 className="content-title">Request Summary</h2>
+            
+            {loading ? (
+              <div className="loading">Loading...</div>
+            ) : (
+              <div className="stats-grid-modern">
+                <div className="stat-card-modern">
+                  <div className="stat-number">{statusCounts.Requested}</div>
+                  <div className="stat-label">
+                    <span className={getStatusBadgeClass('Requested')}>Requested</span>
+                  </div>
+                </div>
+                <div className="stat-card-modern">
+                  <div className="stat-number">{statusCounts.Collected}</div>
+                  <div className="stat-label">
+                    <span className={getStatusBadgeClass('Collected')}>Collected</span>
+                  </div>
+                </div>
+                <div className="stat-card-modern">
+                  <div className="stat-number">{statusCounts.SentToRecycler}</div>
+                  <div className="stat-label">
+                    <span className={getStatusBadgeClass('SentToRecycler')}>Sent to Recycler</span>
+                  </div>
+                </div>
+                <div className="stat-card-modern">
+                  <div className="stat-number">{statusCounts.Recycled}</div>
+                  <div className="stat-label">
+                    <span className={getStatusBadgeClass('Recycled')}>Recycled</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Assigned Requests Tab */}
+        {activeTab === 'requests' && (
+          <div className="content-card">
+            <h2 className="content-title">Assigned Pickup Requests</h2>
+            
+            {loading ? (
+              <div className="loading">Loading requests...</div>
+            ) : requests.length === 0 ? (
+              <p className="empty-text">No assigned requests yet.</p>
+            ) : (
+              <div className="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Created At</th>
+                      <th>Address</th>
+                      <th>Item</th>
+                      <th>Qty</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {requests.map((r) => (
+                      <tr key={r._id}>
+                        <td>{new Date(r.createdAt).toLocaleDateString()}</td>
+                        <td>{r.pickupAddress}</td>
+                        <td>{r.items?.[0]?.description || 'N/A'}</td>
+                        <td>{r.items?.[0]?.quantity || 0}</td>
+                        <td>
+                          <span className={getStatusBadgeClass(r.status)}>
+                            {r.status}
+                          </span>
+                        </td>
+                        <td>
+                          <button
+                            onClick={() => updateStatus(r._id, 'collect')}
+                            disabled={r.status !== 'Requested' || updating === r._id}
+                            className="action-btn action-btn-collect"
+                          >
+                            {updating === r._id ? '...' : 'Collect'}
+                          </button>
+                          <button
+                            onClick={() => updateStatus(r._id, 'send')}
+                            disabled={r.status !== 'Collected' || updating === r._id}
+                            className="action-btn action-btn-send"
+                          >
+                            {updating === r._id ? '...' : 'Send'}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
       </div>
