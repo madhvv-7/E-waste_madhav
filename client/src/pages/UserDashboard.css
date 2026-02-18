@@ -1,0 +1,94 @@
+/* User Dashboard Styles */
+.dashboard-page {
+  min-height: calc(100vh - 60px);
+  background: #f8faf9;
+}
+
+/* Tab Navigation */
+.dashboard-tabs {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dashboard-tabs-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.tabs-nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 1rem 0.25rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  margin-bottom: -1px;
+}
+
+.tab-btn:hover {
+  color: #374151;
+}
+
+.tab-btn.active {
+  color: #111827;
+  border-bottom-color: #111827;
+}
+
+/* Content Area */
+.dashboard-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.content-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+}
+
+.content-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1.5rem;
+}
+
+.pickup-form {
+  max-width: 500px;
+}
+
+.empty-text {
+  color: #6b7280;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .tabs-nav {
+    gap: 1.5rem;
+  }
+
+  .tab-btn {
+    font-size: 0.875rem;
+    padding: 0.875rem 0.125rem;
+  }
+
+  .dashboard-content {
+    padding: 1.5rem 1rem;
+  }
+
+  .content-card {
+    padding: 1.25rem;
+  }
+}
