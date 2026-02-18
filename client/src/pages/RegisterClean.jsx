@@ -167,6 +167,36 @@ export default function RegisterClean() {
                       {fieldErrors.confirmPassword && <div className="register-error">{fieldErrors.confirmPassword}</div>}
                     </div>
 
+                    {/* Phone Field */}
+                    <div className="register-field-wrapper">
+                      <div className={`register-input-group ${fieldErrors.phone ? 'has-error' : ''}`}>
+                        <span className="register-icon">📞</span>
+                        <input
+                          name="phone"
+                          value={form.phone}
+                          onChange={handleChange}
+                          placeholder="Phone (10 digits)"
+                          className="register-input"
+                        />
+                      </div>
+                      {fieldErrors.phone && <div className="register-error">{fieldErrors.phone}</div>}
+                    </div>
+
+                    {/* Address Field */}
+                    <div className="register-field-wrapper">
+                      <div className="register-textarea-group">
+                        <span className="register-textarea-icon">🏠</span>
+                        <textarea
+                          name="address"
+                          value={form.address}
+                          onChange={handleChange}
+                          placeholder="Enter your full address"
+                          className="register-textarea"
+                          rows="2"
+                        />
+                      </div>
+                    </div>
+
                     {/* Role Select */}
                     <div className="register-field-wrapper">
                       <select
@@ -179,38 +209,6 @@ export default function RegisterClean() {
                         <option value="agent">Collection Agent</option>
                       </select>
                     </div>
-
-                    {/* Agent-specific fields */}
-                    {form.role === 'agent' && (
-                      <>
-                        <div className="register-field-wrapper">
-                          <div className={`register-input-group ${fieldErrors.phone ? 'has-error' : ''}`}>
-                            <span className="register-icon">📞</span>
-                            <input
-                              name="phone"
-                              value={form.phone}
-                              onChange={handleChange}
-                              placeholder="Phone (10 digits)"
-                              className="register-input"
-                            />
-                          </div>
-                          {fieldErrors.phone && <div className="register-error">{fieldErrors.phone}</div>}
-                        </div>
-
-                        <div className="register-field-wrapper">
-                          <div className="register-input-group">
-                            <span className="register-icon">🏠</span>
-                            <input
-                              name="address"
-                              value={form.address}
-                              onChange={handleChange}
-                              placeholder="Address"
-                              className="register-input"
-                            />
-                          </div>
-                        </div>
-                      </>
-                    )}
 
                     {/* Submit Button */}
                     <button
