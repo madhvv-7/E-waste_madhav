@@ -854,6 +854,74 @@ function AdminDashboard() {
           </>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && deleteTarget && (
+        <div className="modal-overlay" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1050
+        }}>
+          <div className="modal-content" style={{
+            backgroundColor: '#fff',
+            borderRadius: '12px',
+            padding: '1.5rem',
+            maxWidth: '450px',
+            width: '90%',
+            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.2)'
+          }}>
+            <h4 style={{ color: '#dc3545', marginBottom: '1rem' }}>⚠️ Confirm Delete</h4>
+            <p style={{ marginBottom: '0.5rem' }}>
+              Are you sure you want to <strong>permanently delete</strong> this user?
+            </p>
+            <div style={{
+              backgroundColor: '#f8f9fa',
+              padding: '0.75rem',
+              borderRadius: '8px',
+              marginBottom: '1rem'
+            }}>
+              <p style={{ margin: 0 }}><strong>Name:</strong> {deleteTarget.name}</p>
+              <p style={{ margin: 0 }}><strong>Email:</strong> {deleteTarget.email}</p>
+              <p style={{ margin: 0 }}><strong>Role:</strong> {deleteTarget.role}</p>
+            </div>
+            <p style={{ color: '#dc3545', fontSize: '0.9rem', marginBottom: '1rem' }}>
+              This action cannot be undone. All data associated with this user will be removed.
+            </p>
+            
+            {deleteError && (
+              <div className="alert alert-danger" style={{ marginBottom: '1rem' }}>
+                {deleteError}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={closeDeleteModal}
+                disabled={deleteLoading}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={handleConfirmDelete}
+                disabled={deleteLoading}
+              >
+                {deleteLoading ? 'Deleting...' : 'Delete User'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
