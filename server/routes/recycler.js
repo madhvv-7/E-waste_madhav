@@ -5,13 +5,23 @@ const RecyclingRecord = require('../models/RecyclingRecord');
 
 const router = express.Router();
 
-// GET /api/recycler/requests - View incoming e-waste (SentToRecycler)
+// GET /api/recycler/requests - View incoming + recycled e-waste for this recycler
 router.get('/requests', protect, authorize('recycler'), async (req, res) => {
   try {
-    const requests = await PickupRequest.find({
+    // All SentToRecycler items are visible to every recycler (available to pick up)
+    const incoming = await PickupRequest.find({
       status: 'SentToRecycler',
     }).sort({ createdAt: -1 });
-    res.json(requests);
+
+    // Recycled items: only those processed by this recycler
+    const records = await RecyclingRecord.find({ recyclerId: req.user._id });
+    const recycledIds = records.map((r) => r.pickupRequestId);
+    const recycled = await PickupRequest.find({
+      _id: { $in: recycledIds },
+      status: 'Recycled',
+    }).sort({ createdAt: -1 });
+
+    res.json([...incoming, ...recycled]);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

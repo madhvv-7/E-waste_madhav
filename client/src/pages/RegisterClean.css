@@ -1,6 +1,6 @@
 /* Register Page Container */
 .register-page {
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - 64px);
   background: linear-gradient(180deg, #f6fbf8 0%, #ffffff 100%);
 }
 

@@ -1,14 +1,14 @@
 /* Admin Layout Container */
 .admin-layout {
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - 64px);
 }
 
 /* Sidebar */
 .admin-sidebar {
   width: 240px;
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - 64px);
   position: sticky;
-  top: 60px;
+  top: 0;
   background: #ffffff;
   border-right: 1px solid #e9ecef;
   transition: width 0.2s ease;
@@ -133,7 +133,7 @@
 /* Main Content Area */
 .admin-main {
   background: #f8faf9;
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - 64px);
   padding: 1.5rem;
 }
 
@@ -335,8 +335,8 @@
   .admin-sidebar {
     position: fixed;
     left: 0;
-    top: 60px;
-    height: calc(100vh - 60px);
+    top: 0;
+    height: calc(100vh - 64px);
     z-index: 1000;
   }
 
