@@ -683,51 +683,98 @@ function AdminDashboard() {
 
             {/* Add Recycler */}
             <div style={{ display: activeTab === 'add-recycler' ? 'block' : 'none' }}>
-              <div className="card mb-3">
-                <div className="card-body">
-                  <h3>Add Recycler (admin)</h3>
-                  <p className="text-muted">Create a recycler account manually. Recycler accounts created here are activated immediately.</p>
-                  <form onSubmit={handleCreateRecycler} style={{ maxWidth: 800 }}>
-                    <div className="row g-3">
-                      <div className="col-md-6">
-                        <label className="form-label">Recycler Name (facility/company)</label>
-                        <input type="text" name="name" value={newRecycler.name} onChange={handleNewRecyclerChange} required className={`form-control rounded-pill ${newRecyclerErrors.name ? 'is-invalid' : ''}`} />
-                        {newRecyclerErrors.name && <div className="invalid-feedback d-block">{newRecyclerErrors.name}</div>}
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label">Email</label>
-                        <input type="email" name="email" value={newRecycler.email} onChange={handleNewRecyclerChange} required className={`form-control rounded-pill ${newRecyclerErrors.email ? 'is-invalid' : ''}`} />
-                        {newRecyclerErrors.email && <div className="invalid-feedback d-block">{newRecyclerErrors.email}</div>}
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label">Phone (10 digits)</label>
-                        <input type="text" name="phone" value={newRecycler.phone} onChange={handleNewRecyclerChange} placeholder="1234567890" maxLength={10} className={`form-control rounded-pill ${newRecyclerErrors.phone ? 'is-invalid' : ''}`} />
-                        {newRecyclerErrors.phone && <div className="invalid-feedback d-block">{newRecyclerErrors.phone}</div>}
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label">Password</label>
-                        <div className="input-group">
-                          <input type={showPasswordAdmin ? 'text' : 'password'} name="password" value={newRecycler.password} onChange={handleNewRecyclerChange} required className="form-control rounded-pill" />
-                          <button type="button" className="btn btn-outline-secondary" onClick={() => setShowPasswordAdmin(!showPasswordAdmin)}>{showPasswordAdmin ? 'Hide' : 'Show'}</button>
+              <div className="add-recycler-container">
+                <div className="add-recycler-header">
+                  <h2>Add New Recycler</h2>
+                  <p>Create a new recycler account. Accounts created here are activated immediately.</p>
+                </div>
+
+                <div className="add-recycler-card">
+                  <form onSubmit={handleCreateRecycler}>
+                    {/* Basic Information */}
+                    <div className="form-section">
+                      <div className="form-section-heading">
+                        <span className="form-section-icon">🏢</span>
+                        <div>
+                          <h4>Basic Information</h4>
+                          <p>Enter the recycler facility or company details</p>
                         </div>
-                        {newRecyclerErrors.password && <div className="invalid-feedback d-block">{newRecyclerErrors.password}</div>}
                       </div>
-                      <div className="col-md-6">
-                        <label className="form-label">Confirm Password</label>
-                        <div className="input-group">
-                          <input type={showConfirmPasswordAdmin ? 'text' : 'password'} name="confirmPassword" value={newRecycler.confirmPassword || ''} onChange={handleNewRecyclerChange} required className="form-control rounded-pill" />
-                          <button type="button" className="btn btn-outline-secondary" onClick={() => setShowConfirmPasswordAdmin(!showConfirmPasswordAdmin)}>{showConfirmPasswordAdmin ? 'Hide' : 'Show'}</button>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <label className="form-label">Recycler Name <span className="required-star">*</span></label>
+                          <input type="text" name="name" value={newRecycler.name} onChange={handleNewRecyclerChange} required placeholder="Facility or company name" className={`form-control ${newRecyclerErrors.name ? 'is-invalid' : ''}`} />
+                          {newRecyclerErrors.name && <div className="invalid-feedback d-block">{newRecyclerErrors.name}</div>}
                         </div>
-                        {newRecyclerErrors.confirmPassword && <div className="invalid-feedback d-block">{newRecyclerErrors.confirmPassword}</div>}
+                        <div className="col-md-6">
+                          <label className="form-label">Email Address <span className="required-star">*</span></label>
+                          <input type="email" name="email" value={newRecycler.email} onChange={handleNewRecyclerChange} required placeholder="recycler@example.com" className={`form-control ${newRecyclerErrors.email ? 'is-invalid' : ''}`} />
+                          {newRecyclerErrors.email && <div className="invalid-feedback d-block">{newRecyclerErrors.email}</div>}
+                        </div>
+                        <div className="col-md-6">
+                          <label className="form-label">Phone Number</label>
+                          <input type="text" name="phone" value={newRecycler.phone} onChange={handleNewRecyclerChange} placeholder="10-digit phone number" maxLength={10} className={`form-control ${newRecyclerErrors.phone ? 'is-invalid' : ''}`} />
+                          {newRecyclerErrors.phone && <div className="invalid-feedback d-block">{newRecyclerErrors.phone}</div>}
+                        </div>
                       </div>
-                      <div className="col-12">
-                        <label className="form-label">Full Address</label>
-                        <textarea name="address" value={newRecycler.address} onChange={handleNewRecyclerChange} rows={2} className={`form-control rounded ${newRecyclerErrors.address ? 'is-invalid' : ''}`} />
-                        {newRecyclerErrors.address && <div className="invalid-feedback d-block">{newRecyclerErrors.address}</div>}
+                    </div>
+
+                    {/* Security */}
+                    <div className="form-section">
+                      <div className="form-section-heading">
+                        <span className="form-section-icon">🔒</span>
+                        <div>
+                          <h4>Security</h4>
+                          <p>Set the account password (minimum 8 characters)</p>
+                        </div>
                       </div>
-                      <div className="col-12 d-grid">
-                        <button type="submit" className="btn btn-success rounded-pill" disabled={creatingRecycler}>{creatingRecycler ? 'Creating...' : 'Create Recycler'}</button>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <label className="form-label">Password <span className="required-star">*</span></label>
+                          <div className="password-input-wrapper">
+                            <input type={showPasswordAdmin ? 'text' : 'password'} name="password" value={newRecycler.password} onChange={handleNewRecyclerChange} required placeholder="Minimum 8 characters" className="form-control" />
+                            <button type="button" className="password-toggle-btn" onClick={() => setShowPasswordAdmin(!showPasswordAdmin)}>{showPasswordAdmin ? '🙈' : '👁'}</button>
+                          </div>
+                          {newRecyclerErrors.password && <div className="invalid-feedback d-block">{newRecyclerErrors.password}</div>}
+                        </div>
+                        <div className="col-md-6">
+                          <label className="form-label">Confirm Password <span className="required-star">*</span></label>
+                          <div className="password-input-wrapper">
+                            <input type={showConfirmPasswordAdmin ? 'text' : 'password'} name="confirmPassword" value={newRecycler.confirmPassword || ''} onChange={handleNewRecyclerChange} required placeholder="Re-enter password" className="form-control" />
+                            <button type="button" className="password-toggle-btn" onClick={() => setShowConfirmPasswordAdmin(!showConfirmPasswordAdmin)}>{showConfirmPasswordAdmin ? '🙈' : '👁'}</button>
+                          </div>
+                          {newRecyclerErrors.confirmPassword && <div className="invalid-feedback d-block">{newRecyclerErrors.confirmPassword}</div>}
+                        </div>
                       </div>
+                    </div>
+
+                    {/* Address */}
+                    <div className="form-section form-section-last">
+                      <div className="form-section-heading">
+                        <span className="form-section-icon">📍</span>
+                        <div>
+                          <h4>Address</h4>
+                          <p>Provide the full address of the recycling facility</p>
+                        </div>
+                      </div>
+                      <div className="row g-3">
+                        <div className="col-12">
+                          <label className="form-label">Full Address</label>
+                          <textarea name="address" value={newRecycler.address} onChange={handleNewRecyclerChange} rows={3} placeholder="Street address, city, state, ZIP code" className={`form-control ${newRecyclerErrors.address ? 'is-invalid' : ''}`} />
+                          {newRecyclerErrors.address && <div className="invalid-feedback d-block">{newRecyclerErrors.address}</div>}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Submit */}
+                    <div className="form-submit-area">
+                      <button type="submit" className="btn-create-recycler" disabled={creatingRecycler}>
+                        {creatingRecycler ? (
+                          <><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Creating Account...</>
+                        ) : (
+                          'Create Recycler Account'
+                        )}
+                      </button>
                     </div>
                   </form>
                 </div>
