@@ -247,6 +247,41 @@
   padding: 2rem 0;
 }
 
+/* Profile read-only */
+.profile-readonly-note {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+.profile-readonly {
+  max-width: 550px;
+}
+
+.profile-row {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.profile-row:last-child {
+  border-bottom: none;
+}
+
+.profile-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  min-width: 100px;
+  margin-right: 1rem;
+}
+
+.profile-value {
+  font-size: 0.95rem;
+  color: #111827;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .stats-grid-modern {

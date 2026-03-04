@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import api from '../api';
+import { useAuth } from '../AuthContext';
 import './RecyclerDashboard.css';
 
 function RecyclerDashboard() {
-  const [activeTab, setActiveTab] = useState('overview');
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('profile');
   const [requests, setRequests] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -65,6 +67,7 @@ function RecyclerDashboard() {
   const summary = computeSummary();
 
   const tabs = [
+    { id: 'profile', label: 'Profile' },
     { id: 'overview', label: 'Overview' },
     { id: 'incoming', label: 'Incoming E-Waste' },
   ];
@@ -213,6 +216,32 @@ function RecyclerDashboard() {
                 </div>
               </>
             )}
+          </div>
+        )}
+
+        {/* Profile Tab (read-only) */}
+        {activeTab === 'profile' && (
+          <div className="content-card">
+            <h2 className="content-title">My Profile</h2>
+            <p className="profile-readonly-note">Profile information is view-only. Contact an administrator to update your details.</p>
+            <div className="profile-readonly">
+              <div className="profile-row">
+                <span className="profile-label">Full Name</span>
+                <span className="profile-value">{user?.name || '—'}</span>
+              </div>
+              <div className="profile-row">
+                <span className="profile-label">Email</span>
+                <span className="profile-value">{user?.email || '—'}</span>
+              </div>
+              <div className="profile-row">
+                <span className="profile-label">Phone</span>
+                <span className="profile-value">{user?.phone || '—'}</span>
+              </div>
+              <div className="profile-row">
+                <span className="profile-label">Address</span>
+                <span className="profile-value">{user?.address || '—'}</span>
+              </div>
+            </div>
           </div>
         )}
       </div>

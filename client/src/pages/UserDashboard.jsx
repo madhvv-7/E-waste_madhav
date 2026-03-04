@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import api from '../api';
+import { useAuth } from '../AuthContext';
 import './UserDashboard.css';
 
 function UserDashboard() {
-  const [activeTab, setActiveTab] = useState('pickup');
+  const { user, updateProfile } = useAuth();
+  const [activeTab, setActiveTab] = useState('profile');
   const [pickupAddress, setPickupAddress] = useState('');
   const [itemDescription, setItemDescription] = useState('');
   const [quantity, setQuantity] = useState(1);
@@ -12,6 +14,14 @@ function UserDashboard() {
   const [fetchLoading, setFetchLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [profileForm, setProfileForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+  });
+  const [profileSuccess, setProfileSuccess] = useState('');
+  const [profileError, setProfileError] = useState('');
 
   const fetchRequests = async () => {
     try {
@@ -28,6 +38,50 @@ function UserDashboard() {
   useEffect(() => {
     fetchRequests();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      setProfileForm({
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        address: user.address || '',
+      });
+    }
+  }, [user]);
+
+  const handleProfileChange = (e) => {
+    const { name, value } = e.target;
+    setProfileForm((prev) => ({ ...prev, [name]: value }));
+    setProfileError('');
+    setProfileSuccess('');
+  };
+
+  const handleProfileSubmit = (e) => {
+    e.preventDefault();
+    setProfileError('');
+    setProfileSuccess('');
+    const phone = (profileForm.phone || '').trim();
+    if (phone && !/^\d{10}$/.test(phone)) {
+      setProfileError('Phone must be exactly 10 digits');
+      return;
+    }
+    if (!profileForm.name?.trim()) {
+      setProfileError('Full name is required');
+      return;
+    }
+    if (!profileForm.email?.trim()) {
+      setProfileError('Email is required');
+      return;
+    }
+    updateProfile({
+      name: profileForm.name.trim(),
+      email: profileForm.email.trim().toLowerCase(),
+      phone: phone || undefined,
+      address: (profileForm.address || '').trim() || undefined,
+    });
+    setProfileSuccess('Profile updated successfully.');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,6 +110,7 @@ function UserDashboard() {
   };
 
   const tabs = [
+    { id: 'profile', label: 'Profile' },
     { id: 'pickup', label: 'Pickup Request' },
     { id: 'requests', label: 'My Requests' },
   ];
@@ -171,6 +226,66 @@ function UserDashboard() {
                 </table>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Profile Tab */}
+        {activeTab === 'profile' && (
+          <div className="content-card">
+            <h2 className="content-title">My Profile</h2>
+            {profileError && <div className="message message-error">{profileError}</div>}
+            {profileSuccess && <div className="message message-success">{profileSuccess}</div>}
+            <form onSubmit={handleProfileSubmit} className="pickup-form">
+              <div className="form-field">
+                <label className="field-label">Full Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={profileForm.name}
+                  onChange={handleProfileChange}
+                  required
+                  placeholder="Your full name"
+                  className="field-input"
+                />
+              </div>
+              <div className="form-field">
+                <label className="field-label">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={profileForm.email}
+                  onChange={handleProfileChange}
+                  required
+                  placeholder="you@example.com"
+                  className="field-input"
+                />
+              </div>
+              <div className="form-field">
+                <label className="field-label">Phone</label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={profileForm.phone}
+                  onChange={handleProfileChange}
+                  placeholder="10 digits"
+                  className="field-input"
+                />
+              </div>
+              <div className="form-field">
+                <label className="field-label">Address</label>
+                <textarea
+                  name="address"
+                  value={profileForm.address}
+                  onChange={handleProfileChange}
+                  placeholder="Your address"
+                  rows="3"
+                  className="field-textarea"
+                />
+              </div>
+              <button type="submit" className="submit-btn">
+                Save Profile
+              </button>
+            </form>
           </div>
         )}
       </div>
