@@ -768,7 +768,7 @@ function AdminDashboard() {
             </div>
 
             {/* Add/Edit Recycler */}
-            <div style={{ display: activeTab === 'add-recycler' ? 'block' : 'none' }}>
+            <div style={{ display: (activeTab === 'add-recycler' || activeTab === 'edit-recycler') ? 'block' : 'none' }}>
               {editRecycler ? (
               <div className="add-recycler-container">
                 <div className="add-recycler-header">
@@ -867,6 +867,35 @@ function AdminDashboard() {
                       </button>
                     </div>
                   </form>
+                </div>
+              </div>
+              ) : activeTab === 'edit-recycler' ? (
+              <div className="card mb-3">
+                <div className="card-body">
+                  <h3>Edit Recycler</h3>
+                  <p className="text-muted">Select a recycler below to update their account details (name, email, phone, address, password).</p>
+                  {(() => {
+                    const recyclers = allUsers.filter((u) => u.role === 'recycler');
+                    if (recyclers.length === 0) return <p>No recyclers found. Add one from the Add Recycler section.</p>;
+                    return (
+                      <div className="table-responsive">
+                        <table className="table table-striped">
+                          <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
+                          <tbody>{recyclers.map((u) => (
+                            <tr key={u._id}>
+                              <td>{u.name}</td>
+                              <td>{u.email}</td>
+                              <td>{u.phone || '—'}</td>
+                              <td><span className={getStatusBadgeClass(u.status)}>{u.status}</span></td>
+                              <td>
+                                <button type="button" className="btn btn-primary btn-sm" onClick={() => handleEditRecyclerClick(u)}>Edit</button>
+                              </td>
+                            </tr>
+                          ))}</tbody>
+                        </table>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
               ) : (
