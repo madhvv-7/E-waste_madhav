@@ -253,61 +253,110 @@ function AgentDashboard() {
 
         {/* Profile Tab */}
         {activeTab === 'profile' && (
-          <div className="content-card">
-            <h2 className="content-title">My Profile</h2>
-            {profileError && <div className="message message-error">{profileError}</div>}
-            {profileSuccess && <div className="message message-success">{profileSuccess}</div>}
-            <form onSubmit={handleProfileSubmit} className="pickup-form">
-              <div className="form-field">
-                <label className="field-label">Full Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={profileForm.name}
-                  onChange={handleProfileChange}
-                  required
-                  placeholder="Your full name"
-                  className="field-input"
-                />
+          <div className="profile-container">
+            {/* Avatar Header */}
+            <div className="content-card profile-header-card">
+              <div className="profile-avatar">
+                {(user?.name || 'A').charAt(0).toUpperCase()}
               </div>
-              <div className="form-field">
-                <label className="field-label">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={profileForm.email}
-                  onChange={handleProfileChange}
-                  required
-                  placeholder="you@example.com"
-                  className="field-input"
-                />
+              <h2 className="profile-avatar-name">{user?.name || 'Agent'}</h2>
+              <span className="profile-role-badge">{user?.role || 'agent'}</span>
+            </div>
+
+            {/* Profile Information */}
+            <div className="content-card profile-info-card">
+              {profileError && <div className="message message-error">{profileError}</div>}
+              {profileSuccess && <div className="message message-success">{profileSuccess}</div>}
+              <div className="profile-section-heading">
+                <span className="profile-section-icon">👤</span>
+                <div>
+                  <h3>Profile Information</h3>
+                  <p>Manage your personal details</p>
+                </div>
               </div>
-              <div className="form-field">
-                <label className="field-label">Phone</label>
-                <input
-                  type="text"
-                  name="phone"
-                  value={profileForm.phone}
-                  onChange={handleProfileChange}
-                  placeholder="10 digits"
-                  className="field-input"
-                />
+              <form onSubmit={handleProfileSubmit}>
+                <div className="profile-form-grid">
+                  <div className="form-field">
+                    <label className="field-label">Full Name</label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={profileForm.name}
+                      onChange={handleProfileChange}
+                      required
+                      placeholder="Your full name"
+                      className="field-input"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <label className="field-label">Email Address</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={profileForm.email}
+                      onChange={handleProfileChange}
+                      required
+                      placeholder="you@example.com"
+                      className="field-input"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <label className="field-label">Phone Number</label>
+                    <input
+                      type="text"
+                      name="phone"
+                      value={profileForm.phone}
+                      onChange={handleProfileChange}
+                      placeholder="10-digit number"
+                      className="field-input"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <label className="field-label">Address</label>
+                    <textarea
+                      name="address"
+                      value={profileForm.address}
+                      onChange={handleProfileChange}
+                      placeholder="Your address"
+                      rows="2"
+                      className="field-textarea"
+                    />
+                  </div>
+                </div>
+                <button type="submit" className="submit-btn">
+                  Save Changes
+                </button>
+              </form>
+            </div>
+
+            {/* Change Password */}
+            <div className="content-card profile-password-card">
+              <div className="profile-section-heading">
+                <span className="profile-section-icon">🔒</span>
+                <div>
+                  <h3>Change Password</h3>
+                  <p>Update your account password</p>
+                </div>
               </div>
-              <div className="form-field">
-                <label className="field-label">Address</label>
-                <textarea
-                  name="address"
-                  value={profileForm.address}
-                  onChange={handleProfileChange}
-                  placeholder="Your address"
-                  rows="3"
-                  className="field-textarea"
-                />
+              <div className="profile-form-grid">
+                <div className="form-field">
+                  <label className="field-label">Current Password</label>
+                  <input type="password" placeholder="Enter current password" className="field-input" disabled />
+                </div>
+                <div className="form-field">
+                  <label className="field-label">New Password</label>
+                  <input type="password" placeholder="Enter new password" className="field-input" disabled />
+                </div>
+                <div className="form-field profile-form-full">
+                  <label className="field-label">Confirm New Password</label>
+                  <input type="password" placeholder="Confirm new password" className="field-input" disabled />
+                </div>
               </div>
-              <button type="submit" className="submit-btn">
-                Save Profile
+              <button type="button" className="submit-btn" disabled>
+                Update Password
               </button>
-            </form>
+              <p className="profile-password-note">Password change functionality coming soon.</p>
+            </div>
           </div>
         )}
       </div>

@@ -219,27 +219,44 @@ function RecyclerDashboard() {
           </div>
         )}
 
-        {/* Profile Tab (read-only) */}
+        {/* Profile Tab */}
         {activeTab === 'profile' && (
-          <div className="content-card">
-            <h2 className="content-title">My Profile</h2>
-            <p className="profile-readonly-note">Profile information is view-only. Contact an administrator to update your details.</p>
-            <div className="profile-readonly">
-              <div className="profile-row">
-                <span className="profile-label">Full Name</span>
-                <span className="profile-value">{user?.name || '—'}</span>
+          <div className="profile-container">
+            {/* Avatar Header */}
+            <div className="content-card profile-header-card">
+              <div className="profile-avatar">
+                {(user?.name || 'R').charAt(0).toUpperCase()}
               </div>
-              <div className="profile-row">
-                <span className="profile-label">Email</span>
-                <span className="profile-value">{user?.email || '—'}</span>
+              <h2 className="profile-avatar-name">{user?.name || 'Recycler'}</h2>
+              <span className="profile-role-badge">{user?.role || 'recycler'}</span>
+            </div>
+
+            {/* Profile Information */}
+            <div className="content-card profile-info-card">
+              <div className="profile-section-heading">
+                <span className="profile-section-icon">👤</span>
+                <div>
+                  <h3>Profile Information</h3>
+                  <p>Contact an administrator to update your details</p>
+                </div>
               </div>
-              <div className="profile-row">
-                <span className="profile-label">Phone</span>
-                <span className="profile-value">{user?.phone || '—'}</span>
-              </div>
-              <div className="profile-row">
-                <span className="profile-label">Address</span>
-                <span className="profile-value">{user?.address || '—'}</span>
+              <div className="profile-form-grid">
+                <div className="profile-info-item">
+                  <span className="profile-info-label">Full Name</span>
+                  <span className="profile-info-value">{user?.name || '—'}</span>
+                </div>
+                <div className="profile-info-item">
+                  <span className="profile-info-label">Email</span>
+                  <span className="profile-info-value">{user?.email || '—'}</span>
+                </div>
+                <div className="profile-info-item">
+                  <span className="profile-info-label">Phone</span>
+                  <span className="profile-info-value">{user?.phone || '—'}</span>
+                </div>
+                <div className="profile-info-item">
+                  <span className="profile-info-label">Address</span>
+                  <span className="profile-info-value">{user?.address || '—'}</span>
+                </div>
               </div>
             </div>
           </div>
