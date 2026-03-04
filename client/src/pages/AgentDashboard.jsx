@@ -19,6 +19,14 @@ function AgentDashboard() {
   });
   const [profileSuccess, setProfileSuccess] = useState('');
   const [profileError, setProfileError] = useState('');
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmNewPassword: '',
+  });
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
 
   const fetchRequests = async () => {
     try {
@@ -78,6 +86,41 @@ function AgentDashboard() {
       address: (profileForm.address || '').trim() || undefined,
     });
     setProfileSuccess('Profile updated successfully.');
+  };
+
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordForm((prev) => ({ ...prev, [name]: value }));
+    setPasswordError('');
+    setPasswordSuccess('');
+  };
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess('');
+    if (!passwordForm.currentPassword) {
+      setPasswordError('Current password is required');
+      return;
+    }
+    if (!passwordForm.newPassword || passwordForm.newPassword.length < 8) {
+      setPasswordError('New password must be at least 8 characters');
+      return;
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmNewPassword) {
+      setPasswordError('New passwords do not match');
+      return;
+    }
+    setChangingPassword(true);
+    try {
+      const res = await api.put('/auth/change-password', passwordForm);
+      setPasswordSuccess(res.data.message || 'Password changed successfully');
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
+    } catch (err) {
+      setPasswordError(err.response?.data?.message || 'Could not change password');
+    } finally {
+      setChangingPassword(false);
+    }
   };
 
   const updateStatus = async (id, action) => {
@@ -331,6 +374,8 @@ function AgentDashboard() {
 
             {/* Change Password */}
             <div className="content-card profile-password-card">
+              {passwordError && <div className="message message-error">{passwordError}</div>}
+              {passwordSuccess && <div className="message message-success">{passwordSuccess}</div>}
               <div className="profile-section-heading">
                 <span className="profile-section-icon">🔒</span>
                 <div>
@@ -338,24 +383,49 @@ function AgentDashboard() {
                   <p>Update your account password</p>
                 </div>
               </div>
-              <div className="profile-form-grid">
-                <div className="form-field">
-                  <label className="field-label">Current Password</label>
-                  <input type="password" placeholder="Enter current password" className="field-input" disabled />
+              <form onSubmit={handlePasswordSubmit}>
+                <div className="profile-form-grid">
+                  <div className="form-field">
+                    <label className="field-label">Current Password</label>
+                    <input
+                      type="password"
+                      name="currentPassword"
+                      value={passwordForm.currentPassword}
+                      onChange={handlePasswordChange}
+                      placeholder="Enter current password"
+                      className="field-input"
+                      required
+                    />
+                  </div>
+                  <div className="form-field">
+                    <label className="field-label">New Password</label>
+                    <input
+                      type="password"
+                      name="newPassword"
+                      value={passwordForm.newPassword}
+                      onChange={handlePasswordChange}
+                      placeholder="Minimum 8 characters"
+                      className="field-input"
+                      required
+                    />
+                  </div>
+                  <div className="form-field profile-form-full">
+                    <label className="field-label">Confirm New Password</label>
+                    <input
+                      type="password"
+                      name="confirmNewPassword"
+                      value={passwordForm.confirmNewPassword}
+                      onChange={handlePasswordChange}
+                      placeholder="Re-enter new password"
+                      className="field-input"
+                      required
+                    />
+                  </div>
                 </div>
-                <div className="form-field">
-                  <label className="field-label">New Password</label>
-                  <input type="password" placeholder="Enter new password" className="field-input" disabled />
-                </div>
-                <div className="form-field profile-form-full">
-                  <label className="field-label">Confirm New Password</label>
-                  <input type="password" placeholder="Confirm new password" className="field-input" disabled />
-                </div>
-              </div>
-              <button type="button" className="submit-btn" disabled>
-                Update Password
-              </button>
-              <p className="profile-password-note">Password change functionality coming soon.</p>
+                <button type="submit" className="submit-btn" disabled={changingPassword}>
+                  {changingPassword ? 'Updating...' : 'Update Password'}
+                </button>
+              </form>
             </div>
           </div>
         )}
