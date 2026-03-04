@@ -7,6 +7,7 @@ const navItems = [
   { id: 'users', label: 'All Users', icon: '👥' },
   { id: 'appeals', label: 'User Appeals', icon: '✉️' },
   { id: 'add-recycler', label: 'Add Recycler', icon: '➕' },
+  { id: 'edit-recycler', label: 'Edit Recycler', icon: '✏️' },
   { id: 'reports', label: 'System Reports', icon: '📊' },
   { id: 'requests', label: 'Pickup Requests', icon: '📦' },
 ];

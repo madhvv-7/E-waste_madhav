@@ -3,6 +3,7 @@ const { protect, authorize } = require('../middleware/auth');
 const PickupRequest = require('../models/PickupRequest');
 const User = require('../models/User');
 const RecyclingRecord = require('../models/RecyclingRecord');
+const bcrypt = require('bcryptjs');
 
 const router = express.Router();
 
@@ -377,6 +378,75 @@ router.delete('/delete-account/:id', protect, authorize('admin'), async (req, re
 
     res.json({ message: 'User account permanently deleted' });
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+/**
+ * PUT /api/admin/update-recycler/:id - Update a recycler account
+ * Admin can update name, email, phone, address, and optionally reset password
+ */
+router.put('/update-recycler/:id', protect, authorize('admin'), async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    if (user.role !== 'recycler') {
+      return res.status(400).json({ message: 'This user is not a recycler' });
+    }
+
+    const { name, email, phone, address, password, confirmPassword } = req.body;
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({ message: 'Name is required' });
+    }
+    if (!email || !email.trim()) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+
+    // Check email uniqueness (excluding current user)
+    const emailExists = await User.findOne({ email: email.toLowerCase().trim(), _id: { $ne: user._id } });
+    if (emailExists) {
+      return res.status(400).json({ message: 'Email already in use by another account' });
+    }
+
+    // Validate phone if provided
+    if (phone && !/^\d{10}$/.test(phone.trim())) {
+      return res.status(400).json({ message: 'Phone must be exactly 10 digits' });
+    }
+
+    user.name = name.trim();
+    user.email = email.toLowerCase().trim();
+    user.phone = phone ? phone.trim() : '';
+    user.address = address ? address.trim() : '';
+
+    // Update password only if provided
+    if (password) {
+      if (password.length < 8) {
+        return res.status(400).json({ message: 'Password must be at least 8 characters' });
+      }
+      if (password !== confirmPassword) {
+        return res.status(400).json({ message: 'Passwords do not match' });
+      }
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+    }
+
+    await user.save();
+
+    const userData = user.toObject();
+    delete userData.password;
+
+    res.json({
+      message: 'Recycler updated successfully',
+      user: userData,
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ message: 'Email already in use by another account' });
+    }
     res.status(500).json({ message: error.message });
   }
 });

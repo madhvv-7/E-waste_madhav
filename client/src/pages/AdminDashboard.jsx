@@ -301,6 +301,16 @@ function AdminDashboard() {
   const [newRecyclerErrors, setNewRecyclerErrors] = useState({});
   const [creatingRecycler, setCreatingRecycler] = useState(false);
 
+  // --- Edit Recycler ---
+  const [editRecycler, setEditRecycler] = useState(null);
+  const [editRecyclerForm, setEditRecyclerForm] = useState({
+    name: '', email: '', phone: '', address: '', password: '', confirmPassword: '',
+  });
+  const [editRecyclerErrors, setEditRecyclerErrors] = useState({});
+  const [updatingRecycler, setUpdatingRecycler] = useState(false);
+  const [showEditPassword, setShowEditPassword] = useState(false);
+  const [showEditConfirmPassword, setShowEditConfirmPassword] = useState(false);
+
   const handleNewRecyclerChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === 'checkbox') {
@@ -376,6 +386,82 @@ function AdminDashboard() {
       setError(err.response?.data?.message || 'Could not create recycler account');
     } finally {
       setCreatingRecycler(false);
+    }
+  };
+
+  // --- Edit Recycler Handlers ---
+  const handleEditRecyclerClick = (recycler) => {
+    setEditRecycler(recycler);
+    setEditRecyclerForm({
+      name: recycler.name || '',
+      email: recycler.email || '',
+      phone: recycler.phone || '',
+      address: recycler.address || '',
+      password: '',
+      confirmPassword: '',
+    });
+    setEditRecyclerErrors({});
+    setShowEditPassword(false);
+    setShowEditConfirmPassword(false);
+    setActiveTab('edit-recycler');
+  };
+
+  const handleCancelEdit = () => {
+    setEditRecycler(null);
+    setEditRecyclerForm({ name: '', email: '', phone: '', address: '', password: '', confirmPassword: '' });
+    setEditRecyclerErrors({});
+    setShowEditPassword(false);
+    setShowEditConfirmPassword(false);
+    setActiveTab('edit-recycler');
+  };
+
+  const handleEditRecyclerChange = (e) => {
+    const { name, value } = e.target;
+    setEditRecyclerForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleUpdateRecycler = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setUpdatingRecycler(true);
+    try {
+      const errs = {};
+      if (!editRecyclerForm.name || editRecyclerForm.name.trim() === '') errs.name = 'Name is required';
+      if (!editRecyclerForm.email || editRecyclerForm.email.trim() === '') errs.email = 'Email is required';
+      if (editRecyclerForm.phone && !/^[0-9]{10}$/.test(editRecyclerForm.phone)) errs.phone = 'Phone must be 10 digits';
+      if (editRecyclerForm.password) {
+        if (editRecyclerForm.password.length < 8) errs.password = 'Password must be at least 8 characters';
+        if (editRecyclerForm.password !== editRecyclerForm.confirmPassword) errs.confirmPassword = 'Passwords do not match';
+      }
+      setEditRecyclerErrors(errs);
+      if (Object.keys(errs).length > 0) {
+        setUpdatingRecycler(false);
+        return;
+      }
+
+      const payload = {
+        name: editRecyclerForm.name,
+        email: editRecyclerForm.email,
+        phone: editRecyclerForm.phone,
+        address: editRecyclerForm.address,
+      };
+      if (editRecyclerForm.password) {
+        payload.password = editRecyclerForm.password;
+        payload.confirmPassword = editRecyclerForm.confirmPassword;
+      }
+
+      await api.put(`/admin/update-recycler/${editRecycler._id}`, payload);
+      setSuccess('Recycler updated successfully.');
+      setEditRecycler(null);
+      setEditRecyclerForm({ name: '', email: '', phone: '', address: '', password: '', confirmPassword: '' });
+      setEditRecyclerErrors({});
+      await fetchData();
+      setActiveTab('edit-recycler');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Could not update recycler');
+    } finally {
+      setUpdatingRecycler(false);
     }
   };
 
@@ -681,8 +767,109 @@ function AdminDashboard() {
               </div>
             </div>
 
-            {/* Add Recycler */}
+            {/* Add/Edit Recycler */}
             <div style={{ display: activeTab === 'add-recycler' ? 'block' : 'none' }}>
+              {editRecycler ? (
+              <div className="add-recycler-container">
+                <div className="add-recycler-header">
+                  <h2>Edit Recycler</h2>
+                  <p>Update recycler account details for <strong>{editRecycler.name}</strong>.</p>
+                </div>
+
+                <div className="add-recycler-card">
+                  <form onSubmit={handleUpdateRecycler}>
+                    {/* Basic Information */}
+                    <div className="form-section">
+                      <div className="form-section-heading">
+                        <span className="form-section-icon">🏢</span>
+                        <div>
+                          <h4>Basic Information</h4>
+                          <p>Update the recycler facility or company details</p>
+                        </div>
+                      </div>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <label className="form-label">Recycler Name <span className="required-star">*</span></label>
+                          <input type="text" name="name" value={editRecyclerForm.name} onChange={handleEditRecyclerChange} required placeholder="Facility or company name" className={`form-control ${editRecyclerErrors.name ? 'is-invalid' : ''}`} />
+                          {editRecyclerErrors.name && <div className="invalid-feedback d-block">{editRecyclerErrors.name}</div>}
+                        </div>
+                        <div className="col-md-6">
+                          <label className="form-label">Email Address <span className="required-star">*</span></label>
+                          <input type="email" name="email" value={editRecyclerForm.email} onChange={handleEditRecyclerChange} required placeholder="recycler@example.com" className={`form-control ${editRecyclerErrors.email ? 'is-invalid' : ''}`} />
+                          {editRecyclerErrors.email && <div className="invalid-feedback d-block">{editRecyclerErrors.email}</div>}
+                        </div>
+                        <div className="col-md-6">
+                          <label className="form-label">Phone Number</label>
+                          <input type="text" name="phone" value={editRecyclerForm.phone} onChange={handleEditRecyclerChange} placeholder="10-digit phone number" maxLength={10} className={`form-control ${editRecyclerErrors.phone ? 'is-invalid' : ''}`} />
+                          {editRecyclerErrors.phone && <div className="invalid-feedback d-block">{editRecyclerErrors.phone}</div>}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Security */}
+                    <div className="form-section">
+                      <div className="form-section-heading">
+                        <span className="form-section-icon">🔒</span>
+                        <div>
+                          <h4>Security</h4>
+                          <p>Leave blank to keep the current password</p>
+                        </div>
+                      </div>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <label className="form-label">New Password</label>
+                          <div className="password-input-wrapper">
+                            <input type={showEditPassword ? 'text' : 'password'} name="password" value={editRecyclerForm.password} onChange={handleEditRecyclerChange} placeholder="Leave blank to keep current" className="form-control" />
+                            <button type="button" className="password-toggle-btn" onClick={() => setShowEditPassword(!showEditPassword)}>{showEditPassword ? '🙈' : '👁'}</button>
+                          </div>
+                          {editRecyclerErrors.password && <div className="invalid-feedback d-block">{editRecyclerErrors.password}</div>}
+                        </div>
+                        <div className="col-md-6">
+                          <label className="form-label">Confirm New Password</label>
+                          <div className="password-input-wrapper">
+                            <input type={showEditConfirmPassword ? 'text' : 'password'} name="confirmPassword" value={editRecyclerForm.confirmPassword} onChange={handleEditRecyclerChange} placeholder="Re-enter new password" className="form-control" />
+                            <button type="button" className="password-toggle-btn" onClick={() => setShowEditConfirmPassword(!showEditConfirmPassword)}>{showEditConfirmPassword ? '🙈' : '👁'}</button>
+                          </div>
+                          {editRecyclerErrors.confirmPassword && <div className="invalid-feedback d-block">{editRecyclerErrors.confirmPassword}</div>}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Address */}
+                    <div className="form-section form-section-last">
+                      <div className="form-section-heading">
+                        <span className="form-section-icon">📍</span>
+                        <div>
+                          <h4>Address</h4>
+                          <p>Update the full address of the recycling facility</p>
+                        </div>
+                      </div>
+                      <div className="row g-3">
+                        <div className="col-12">
+                          <label className="form-label">Full Address</label>
+                          <textarea name="address" value={editRecyclerForm.address} onChange={handleEditRecyclerChange} rows={3} placeholder="Street address, city, state, ZIP code" className={`form-control ${editRecyclerErrors.address ? 'is-invalid' : ''}`} />
+                          {editRecyclerErrors.address && <div className="invalid-feedback d-block">{editRecyclerErrors.address}</div>}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Submit */}
+                    <div className="form-submit-area" style={{ display: 'flex', gap: '1rem' }}>
+                      <button type="button" onClick={handleCancelEdit} style={{ padding: '0.85rem 2rem', fontSize: '1rem', fontWeight: 600, borderRadius: '10px', border: '1px solid #d1d5db', background: '#fff', color: '#374151', cursor: 'pointer' }}>
+                        Cancel
+                      </button>
+                      <button type="submit" className="btn-create-recycler" style={{ flex: 1 }} disabled={updatingRecycler}>
+                        {updatingRecycler ? (
+                          <><span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Updating...</>
+                        ) : (
+                          'Update Recycler'
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              ) : (
               <div className="add-recycler-container">
                 <div className="add-recycler-header">
                   <h2>Add New Recycler</h2>
@@ -779,6 +966,7 @@ function AdminDashboard() {
                   </form>
                 </div>
               </div>
+              )}
             </div>
 
             {/* Reports */}
