@@ -1,0 +1,100 @@
+================================================================================
+E-WASTE COLLECTION AND RECYCLING MANAGEMENT SYSTEM - DATABASE SCHEMA
+================================================================================
+Database: MongoDB (Mongoose ODM)
+Document generated from server/models/
+
+================================================================================
+1. USER (Collection: users)
+================================================================================
+
+| Field Name  | Data Type     | Constraints                    | Required | Description                          |
+|-------------|---------------|--------------------------------|----------|--------------------------------------|
+| name        | String        | trim                           | Yes      | Full name of the user                |
+| email       | String        | unique, lowercase, trim        | Yes      | User login email                     |
+| password    | String        | -                              | Yes      | Hashed password for authentication   |
+| role        | String        | enum: user, agent, recycler, admin | No   | User role; default: 'user'           |
+| address     | String        | trim                           | No       | User's address                       |
+| phone       | String        | trim                           | No       | Contact phone number                 |
+| status      | String        | enum: pending, active, rejected, deactivated | No | Account status; default: 'active' |
+| createdAt   | Date          | (timestamps)                   | Auto     | Record creation timestamp            |
+| updatedAt   | Date          | (timestamps)                   | Auto     | Record last update timestamp         |
+
+================================================================================
+2. PICKUP REQUEST (Collection: pickuprequests)
+================================================================================
+
+| Field Name     | Data Type     | Constraints                              | Required | Description                          |
+|----------------|---------------|------------------------------------------|----------|--------------------------------------|
+| userId         | ObjectId      | ref: User                                | Yes      | User who created the pickup request  |
+| items          | Array         | subdocument (see below)                  | Yes      | List of e-waste items in request     |
+| pickupAddress  | String        | trim                                     | Yes      | Address for collection               |
+| assignedAgentId| ObjectId      | ref: User, default: null                 | No       | Collection agent assigned to request |
+| status         | String        | enum: Requested, Collected, SentToRecycler, Recycled | No | Request status; default: 'Requested' |
+| createdAt      | Date          | (timestamps)                             | Auto     | Record creation timestamp            |
+| updatedAt      | Date          | (timestamps)                             | Auto     | Record last update timestamp         |
+
+--- Items subdocument (embedded in items array) ---
+| Field Name  | Data Type | Constraints | Required | Description                |
+|-------------|-----------|-------------|----------|----------------------------|
+| description | String    | trim        | Yes      | Description of e-waste item|
+| quantity    | Number    | default: 1  | Yes      | Number of items            |
+
+================================================================================
+3. E-WASTE ITEM (Collection: ewasteitems)
+================================================================================
+
+| Field Name     | Data Type | Constraints | Required | Description                        |
+|----------------|-----------|-------------|----------|------------------------------------|
+| itemType       | String    | trim        | Yes      | Type of e-waste (e.g. laptop, phone) |
+| description    | String    | trim        | No       | Additional description             |
+| estimatedWeight| Number    | -           | Yes      | Estimated weight of item (e.g. kg) |
+| category       | String    | trim        | Yes      | Category of e-waste                |
+| isHazardous    | Boolean   | default: false | No    | Whether item is hazardous          |
+| createdAt      | Date      | (timestamps)| Auto     | Record creation timestamp          |
+| updatedAt      | Date      | (timestamps)| Auto     | Record last update timestamp      |
+
+================================================================================
+4. RECYCLING RECORD (Collection: recyclingrecords)
+================================================================================
+
+| Field Name       | Data Type | Constraints     | Required | Description                          |
+|------------------|-----------|-----------------|----------|--------------------------------------|
+| pickupRequestId  | ObjectId  | ref: PickupRequest | Yes   | Pickup request being recycled        |
+| recyclerId       | ObjectId  | ref: User       | Yes      | Recycler who processed the e-waste   |
+| recyclingMethod  | String    | trim            | No       | Method used for recycling            |
+| completionDate   | Date      | -               | No       | Date recycling was completed         |
+| remarks          | String    | trim            | No       | Additional notes or remarks          |
+| createdAt        | Date      | (timestamps)    | Auto     | Record creation timestamp            |
+| updatedAt        | Date      | (timestamps)    | Auto     | Record last update timestamp         |
+
+================================================================================
+5. APPEAL (Collection: appeals)
+================================================================================
+
+| Field Name   | Data Type | Constraints                    | Required | Description                          |
+|--------------|-----------|--------------------------------|----------|--------------------------------------|
+| userId       | ObjectId  | ref: User                      | Yes      | User who submitted the appeal       |
+| role         | String    | enum: user, agent, recycler, admin | Yes  | Role context for the appeal         |
+| currentStatus| String    | -                              | Yes      | Current status being appealed       |
+| subject      | String    | trim                           | No       | Subject/title of the appeal          |
+| message      | String    | trim                           | Yes      | Appeal or contact message content   |
+| resolved     | Boolean   | default: false                 | No       | Whether appeal has been resolved    |
+| createdAt    | Date      | (timestamps)                   | Auto     | Record creation timestamp           |
+| updatedAt    | Date      | (timestamps)                   | Auto     | Record last update timestamp        |
+
+================================================================================
+RELATIONSHIPS (References)
+================================================================================
+- User 1:N PickupRequest (userId)
+- User 1:N PickupRequest (assignedAgentId)
+- User 1:N RecyclingRecord (recyclerId)
+- User 1:N Appeal (userId)
+- PickupRequest 1:N RecyclingRecord (pickupRequestId)
+
+================================================================================
+REQUEST STATUS FLOW
+================================================================================
+PickupRequest.status: Requested → Collected → SentToRecycler → Recycled
+
+================================================================================

@@ -1,0 +1,298 @@
+================================================================================
+E-WASTE COLLECTION AND RECYCLING MANAGEMENT SYSTEM - DATA FLOW DIAGRAMS (DFD)
+================================================================================
+Mermaid code for use in documentation, Mermaid Live Editor, or any Mermaid-supported tool.
+Copy each code block as needed.
+
+Notation:
+- [Entity]     = External entity (source/sink)
+- (Process)    = Process/function
+- [(Store)]    = Data store
+- -->          = Data flow (label on arrow where shown)
+
+================================================================================
+DFD LEVEL 0 - CONTEXT DIAGRAM (ENTIRE PROJECT)
+================================================================================
+Shows the system as a single process with external entities and main data flows.
+
+```mermaid
+flowchart LR
+    subgraph External_Entities
+        U[User/Citizen]
+        A[Collection Agent]
+        R[Recycler]
+        AD[Admin]
+    end
+
+    subgraph System["E-Waste Management System"]
+        P0(("0\nE-Waste Collection & Recycling\nManagement System"))
+    end
+
+    DB[(("Database\n(Users, Pickup Requests,\nRecycling Records, Appeals)"))]
+
+    U -->|"Register, Login, Pickup Request,\nTrack Status, History"| P0
+    P0 -->|"Confirmation, Status Updates,\nPickup History"| U
+
+    A -->|"Login, View Assigned Requests,\nUpdate Status, Handover"| P0
+    P0 -->|"Assigned Requests,\nConfirmation"| A
+
+    R -->|"Login, View Incoming E-Waste,\nUpdate Recycling Status, Notes"| P0
+    P0 -->|"Incoming Requests,\nConfirmation"| R
+
+    AD -->|"Login, Manage Users,\nAssign Agents, Reports"| P0
+    P0 -->|"Dashboard, Reports,\nStatistics"| AD
+
+    P0 <-->|"Read/Write"| DB
+```
+
+================================================================================
+DFD LEVEL 1 - SYSTEM DECOMPOSITION (ENTIRE PROJECT)
+================================================================================
+Decomposes the system into major processes and data stores.
+
+```mermaid
+flowchart TB
+    subgraph External_Entities
+        U[User/Citizen]
+        CA[Collection Agent]
+        RC[Recycler]
+        AD[Admin]
+    end
+
+    subgraph Processes["Level 1 - Main Processes"]
+        P1(("1\nAuthentication"))
+        P2(("2\nUser/Citizen\nOperations"))
+        P3(("3\nCollection Agent\nOperations"))
+        P4(("4\nRecycler\nOperations"))
+        P5(("5\nAdmin\nOperations"))
+    end
+
+    subgraph Data_Stores
+        D1[(("D1\nUsers"))]
+        D2[(("D2\nPickup\nRequests"))]
+        D3[(("D3\nRecycling\nRecords"))]
+        D4[(("D4\nAppeals"))]
+    end
+
+    U -->|Credentials, Reg Data| P1
+    U -->|Pickup Request, Track Query| P2
+    P1 -->|Token, Session| U
+    P2 -->|Status, History| U
+
+    CA -->|Credentials| P1
+    CA -->|Status Update, Handover| P3
+    P1 -->|Token| CA
+    P3 -->|Assigned Requests| CA
+
+    RC -->|Credentials| P1
+    RC -->|Recycling Status, Notes| P4
+    P1 -->|Token| RC
+    P4 -->|Incoming E-Waste| RC
+
+    AD -->|Credentials| P1
+    AD -->|Assign, Manage, View Reports| P5
+    P1 -->|Token| AD
+    P5 -->|Dashboard, Reports| AD
+
+    P1 <-->|Verify/Update| D1
+    P2 -->|Create, Read| D2
+    P2 <-->|Read| D1
+    P3 <-->|Read/Update Status| D2
+    P3 <-->|Read| D1
+    P4 <-->|Read/Update, Create Record| D2
+    P4 <-->|Read/Create| D3
+    P5 <-->|Read/Write All| D1
+    P5 <-->|Read/Assign/Update| D2
+    P5 <-->|Read| D3
+    P5 <-->|Read/Update| D4
+```
+
+================================================================================
+DFD LEVEL 1.1 - USER (CITIZEN) MODULE
+================================================================================
+Detail for the User/Citizen role: registration, login, pickup requests, tracking.
+
+```mermaid
+flowchart TB
+    subgraph External
+        U[User/Citizen]
+    end
+
+    subgraph User_Module["1.1 User (Citizen) Module"]
+        P1_1(("1.1.1\nRegister"))
+        P1_2(("1.1.2\nLogin"))
+        P1_3(("1.1.3\nCreate Pickup\nRequest"))
+        P1_4(("1.1.4\nTrack Request\nStatus"))
+        P1_5(("1.1.5\nView Pickup\nHistory"))
+    end
+
+    subgraph Data_Stores
+        D1[(("D1\nUsers"))]
+        D2[(("D2\nPickup\nRequests"))]
+    end
+
+    U -->|Name, Email, Password, Role| P1_1
+    U -->|Email, Password| P1_2
+    U -->|Items, Pickup Address| P1_3
+    U -->|Request ID / Query| P1_4
+    U -->|Query| P1_5
+
+    P1_1 -->|Account Created| U
+    P1_2 -->|Token, User Info| U
+    P1_3 -->|Request ID, Confirmation| U
+    P1_4 -->|Status (Requested/Collected/etc.)| U
+    P1_5 -->|List of Requests| U
+
+    P1_1 -->|Store User| D1
+    P1_2 -->|Validate| D1
+    P1_3 -->|Create Request| D2
+    P1_3 -->|Read User| D1
+    P1_4 -->|Read Requests| D2
+    P1_5 -->|Read Requests by User| D2
+```
+
+================================================================================
+DFD LEVEL 1.2 - COLLECTION AGENT MODULE
+================================================================================
+Detail for the Collection Agent role: login, view assigned requests, update status, handover.
+
+```mermaid
+flowchart TB
+    subgraph External
+        CA[Collection Agent]
+    end
+
+    subgraph Agent_Module["1.2 Collection Agent Module"]
+        P2_1(("2.1\nLogin"))
+        P2_2(("2.2\nView Assigned\nPickup Requests"))
+        P2_3(("2.3\nUpdate Status\n(Collected)"))
+        P2_4(("2.4\nHand Over to\nRecycler"))
+    end
+
+    subgraph Data_Stores
+        D1[(("D1\nUsers"))]
+        D2[(("D2\nPickup\nRequests"))]
+    end
+
+    CA -->|Credentials| P2_1
+    CA -->|Query Assigned| P2_2
+    CA -->|Request ID, Collected| P2_3
+    CA -->|Request ID, Sent to Recycler| P2_4
+
+    P2_1 -->|Token, Agent Info| CA
+    P2_2 -->|List of Assigned Requests| CA
+    P2_3 -->|Confirmation| CA
+    P2_4 -->|Confirmation| CA
+
+    P2_1 -->|Validate| D1
+    P2_2 -->|Read Requests by Agent| D2
+    P2_2 -->|Read| D1
+    P2_3 -->|Update Status = Collected| D2
+    P2_4 -->|Update Status = SentToRecycler| D2
+```
+
+================================================================================
+DFD LEVEL 1.3 - RECYCLER MODULE
+================================================================================
+Detail for the Recycler role: login, view incoming e-waste, update recycling status, add notes.
+
+```mermaid
+flowchart TB
+    subgraph External
+        RC[Recycler]
+    end
+
+    subgraph Recycler_Module["1.3 Recycler Module"]
+        P3_1(("3.1\nLogin"))
+        P3_2(("3.2\nView Incoming\nE-Waste"))
+        P3_3(("3.3\nUpdate Recycling\nStatus"))
+        P3_4(("3.4\nAdd Recycling\nNotes"))
+    end
+
+    subgraph Data_Stores
+        D1[(("D1\nUsers"))]
+        D2[(("D2\nPickup\nRequests"))]
+        D3[(("D3\nRecycling\nRecords"))]
+    end
+
+    RC -->|Credentials| P3_1
+    RC -->|Query| P3_2
+    RC -->|Request ID, Recycled| P3_3
+    RC -->|Method, Completion Date, Remarks| P3_4
+
+    P3_1 -->|Token, Recycler Info| RC
+    P3_2 -->|Incoming Pickup Requests| RC
+    P3_3 -->|Confirmation| RC
+    P3_4 -->|Confirmation| RC
+
+    P3_1 -->|Validate| D1
+    P3_2 -->|Read Requests SentToRecycler| D2
+    P3_3 -->|Update Request Status = Recycled| D2
+    P3_3 -->|Create Record| D3
+    P3_4 -->|Update/Create Recycling Record| D3
+    P3_4 -->|Read| D2
+```
+
+================================================================================
+DFD LEVEL 1.4 - ADMIN MODULE
+================================================================================
+Detail for the Admin role: login, manage users, assign agents, monitor flow, reports.
+
+```mermaid
+flowchart TB
+    subgraph External
+        AD[Admin]
+    end
+
+    subgraph Admin_Module["1.4 Admin Module"]
+        P4_1(("4.1\nLogin"))
+        P4_2(("4.2\nManage Users,\nAgents, Recyclers"))
+        P4_3(("4.3\nAssign Pickup\nRequests to Agents"))
+        P4_4(("4.4\nMonitor System\nFlow"))
+        P4_5(("4.5\nView Reports &\nStatistics"))
+    end
+
+    subgraph Data_Stores
+        D1[(("D1\nUsers"))]
+        D2[(("D2\nPickup\nRequests"))]
+        D3[(("D3\nRecycling\nRecords"))]
+        D4[(("D4\nAppeals"))]
+    end
+
+    AD -->|Credentials| P4_1
+    AD -->|User Updates, Status Changes| P4_2
+    AD -->|Request ID, Agent ID| P4_3
+    AD -->|Query| P4_4
+    AD -->|Query Reports| P4_5
+
+    P4_1 -->|Token, Admin Info| AD
+    P4_2 -->|Confirmation, User List| AD
+    P4_3 -->|Confirmation| AD
+    P4_4 -->|All Requests, Status Flow| AD
+    P4_5 -->|Analytics, Reports| AD
+
+    P4_1 -->|Validate Admin| D1
+    P4_2 -->|Read/Update Users| D1
+    P4_3 -->|Read Requests, Update AssignedAgentId| D2
+    P4_3 -->|Read Agents| D1
+    P4_4 -->|Read All| D2
+    P4_4 -->|Read| D1
+    P4_5 -->|Read Aggregated| D2
+    P4_5 -->|Read| D3
+    P4_5 -->|Read| D1
+    P4_5 -->|Read| D4
+```
+
+================================================================================
+SUMMARY OF DFD LEVELS
+================================================================================
+| Level   | Scope                    | Description                                      |
+|---------|--------------------------|--------------------------------------------------|
+| 0       | Entire project           | Single process, external entities, main flows   |
+| 1       | Entire project           | Five processes (Auth, User, Agent, Recycler, Admin) |
+| 1.1     | User (Citizen) module    | Register, Login, Create request, Track, History  |
+| 1.2     | Collection Agent module  | Login, View assigned, Collect, Handover         |
+| 1.3     | Recycler module          | Login, View incoming, Mark recycled, Add notes  |
+| 1.4     | Admin module             | Login, Manage users, Assign agents, Monitor, Reports |
+
+================================================================================
