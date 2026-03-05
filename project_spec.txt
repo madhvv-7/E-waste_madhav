@@ -1,4 +1,4 @@
-E-Waste Collection and Recycling Management System – Example
+E-Waste Collection and Recycling Management System
 ------------------------------------------------------------
 1. PROJECT OVERVIEW
 ----------------------
@@ -51,6 +51,7 @@ Can Manage Users, Agents, and Recyclers.
 Can Assign Pickup Requests to Agents.
 Can Monitor Entire System Flow.
 Can View Reports & Statistics.
+Can view and resolve appeals (contact requests).
 ---------------------------------
 5. DATABASE STRUCTURE (Schemas)
 ----------------------------
@@ -83,6 +84,9 @@ RecyclerID (Reference)
 RecyclingMethod (String)
 CompletionDate (Timestamp)
 Remarks (String)
+-----------------------------
+E. Appeal Schema:
+UserID (Reference), Subject (String), Message (String), Resolved (Boolean)
 ---------------------------
 6. FEATURE WORKFLOW (User Journey)
 -----------------------------------
@@ -108,6 +112,7 @@ GET /api/pickup/my-requests → View user requests
 Collection Agent
 GET /api/agent/requests → View assigned requests
 PUT /api/agent/collect/:id → Mark as collected
+PUT /api/agent/send-to-recycler/:id → Send to recycler
 
 Recycler
 GET /api/recycler/requests → View incoming e-waste
@@ -117,3 +122,8 @@ Admin
 GET /api/admin/requests → View all requests
 PUT /api/admin/assign/:id → Assign agent
 GET /api/admin/reports → System analytics
+
+Appeals (Contact)
+POST /api/appeals → Submit appeal/contact (e.g. rejected/deactivated users)
+GET /api/appeals → List appeals (admin)
+PUT /api/appeals/:id/resolve → Resolve appeal (admin)
