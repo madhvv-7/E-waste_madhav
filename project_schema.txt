@@ -2,7 +2,7 @@
 E-WASTE COLLECTION AND RECYCLING MANAGEMENT SYSTEM - DATABASE SCHEMA
 ================================================================================
 Database: MongoDB (Mongoose ODM)
-Document generated from server/models/
+Source: server/models/ (User, PickupRequest, EWasteItem, RecyclingRecord, Appeal)
 
 ================================================================================
 1. USER (Collection: users)
@@ -27,7 +27,7 @@ Document generated from server/models/
 | Field Name     | Data Type     | Constraints                              | Required | Description                          |
 |----------------|---------------|------------------------------------------|----------|--------------------------------------|
 | userId         | ObjectId      | ref: User                                | Yes      | User who created the pickup request  |
-| items          | Array         | subdocument (see below)                  | Yes      | List of e-waste items in request     |
+| items          | Array         | subdocument (see below)                  | Yes      | Inline items (description + quantity); no ref to EWasteItem |
 | pickupAddress  | String        | trim                                     | Yes      | Address for collection               |
 | assignedAgentId| ObjectId      | ref: User, default: null                 | No       | Collection agent assigned to request |
 | status         | String        | enum: Requested, Collected, SentToRecycler, Recycled | No | Request status; default: 'Requested' |
@@ -76,7 +76,7 @@ Document generated from server/models/
 |--------------|-----------|--------------------------------|----------|--------------------------------------|
 | userId       | ObjectId  | ref: User                      | Yes      | User who submitted the appeal       |
 | role         | String    | enum: user, agent, recycler, admin | Yes  | Role context for the appeal         |
-| currentStatus| String    | -                              | Yes      | Current status being appealed       |
+| currentStatus| String    | (no enum)                      | Yes      | Current account status being appealed |
 | subject      | String    | trim                           | No       | Subject/title of the appeal          |
 | message      | String    | trim                           | Yes      | Appeal or contact message content   |
 | resolved     | Boolean   | default: false                 | No       | Whether appeal has been resolved    |
