@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
+import homePlatformImage from '../assets/images/home-platform.jpg';
 import './Home.css';
 
 export default function Home() {
@@ -238,8 +239,13 @@ export default function Home() {
               </div>
             </div>
             <div className="home-info-image">
-              <div className="home-large-image-placeholder">
-                <span>Platform Image</span>
+              <div className="home-large-image-placeholder image-filled">
+                <img
+                  src={homePlatformImage}
+                  alt="E-waste platform operations overview"
+                  className="home-section-image"
+                  loading="lazy"
+                />
               </div>
             </div>
           </div>

@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import aboutHeroImage from '../assets/images/about-hero.jpg';
+import aboutMissionImage from '../assets/images/about-mission.jpg';
+import aboutVisionImage from '../assets/images/about-vision.jpg';
 import './About.css';
 
 export default function About() {
@@ -37,8 +40,13 @@ export default function About() {
               </div>
             </div>
             <div className="about-hero-image">
-              <div className="image-placeholder large">
-                <span>Hero Image</span>
+              <div className="image-placeholder large image-filled">
+                <img
+                  src={aboutHeroImage}
+                  alt="About our e-waste management platform"
+                  className="about-page-image"
+                  loading="lazy"
+                />
               </div>
             </div>
           </div>
@@ -50,8 +58,13 @@ export default function About() {
         <div className="container">
           <div className="mission-inner">
             <div className="mission-image">
-              <div className="image-placeholder medium">
-                <span>Mission Image</span>
+              <div className="image-placeholder medium image-filled">
+                <img
+                  src={aboutMissionImage}
+                  alt="Team mission for sustainable recycling"
+                  className="about-page-image"
+                  loading="lazy"
+                />
               </div>
             </div>
             <div className="mission-text">
@@ -135,8 +148,13 @@ export default function About() {
               </div>
             </div>
             <div className="vision-image">
-              <div className="image-placeholder wide">
-                <span>Vision Image</span>
+              <div className="image-placeholder wide image-filled">
+                <img
+                  src={aboutVisionImage}
+                  alt="Vision for technology and circular economy"
+                  className="about-page-image"
+                  loading="lazy"
+                />
               </div>
             </div>
           </div>

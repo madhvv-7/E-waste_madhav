@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import exploreHeroImage from '../assets/images/explore-hero.jpg';
+import exploreFeature1Image from '../assets/images/explore-feature-1.jpg';
+import exploreFeature2Image from '../assets/images/explore-feature-2.jpg';
+import exploreFeature3Image from '../assets/images/explore-feature-3.jpg';
+import exploreFeature4Image from '../assets/images/explore-feature-4.jpg';
+import exploreProcessImage from '../assets/images/explore-process.jpg';
+import exploreRoleCitizensImage from '../assets/images/explore-role-citizens.jpg';
+import exploreRoleAgentsImage from '../assets/images/explore-role-agents.jpg';
+import exploreRoleRecyclersImage from '../assets/images/explore-role-recyclers.jpg';
 import './Explore.css';
 
 export default function Explore() {
@@ -47,6 +56,17 @@ export default function Explore() {
     { number: '98%', label: 'Satisfaction Rate', icon: '⭐' },
     { number: '24/7', label: 'Support Available', icon: '💬' },
   ];
+  const roleImages = {
+    citizens: exploreRoleCitizensImage,
+    agents: exploreRoleAgentsImage,
+    recyclers: exploreRoleRecyclersImage,
+  };
+  const featureImages = [
+    exploreFeature1Image,
+    exploreFeature2Image,
+    exploreFeature3Image,
+    exploreFeature4Image,
+  ];
 
   return (
     <>
@@ -62,8 +82,13 @@ export default function Explore() {
             </p>
           </div>
           <div className={`explore-hero-image ${animateHero}`}>
-            <div className="image-placeholder hero-wide">
-              <span>Platform Overview Image</span>
+            <div className="image-placeholder hero-wide image-filled">
+              <img
+                src={exploreHeroImage}
+                alt="Platform overview dashboard"
+                className="explore-page-image"
+                loading="lazy"
+              />
             </div>
           </div>
         </div>
@@ -80,8 +105,13 @@ export default function Explore() {
             {features.map((feature, index) => (
               <div key={index} className="col-12 col-md-6 col-lg-3">
                 <div className="feature-card">
-                  <div className="feature-image-placeholder">
-                    <span>Feature Image</span>
+                  <div className="feature-image-placeholder image-filled">
+                    <img
+                      src={featureImages[index]}
+                      alt={`${feature.title} visual`}
+                      className="explore-page-image"
+                      loading="lazy"
+                    />
                   </div>
                   <div className="feature-icon">
                     <span>{feature.icon}</span>
@@ -103,8 +133,13 @@ export default function Explore() {
             A simple 4-step process to recycle your e-waste
           </p>
           <div className="process-visual">
-            <div className="image-placeholder process-wide">
-              <span>Process Flow Diagram</span>
+            <div className="image-placeholder process-wide image-filled">
+              <img
+                src={exploreProcessImage}
+                alt="E-waste process workflow"
+                className="explore-page-image"
+                loading="lazy"
+              />
             </div>
           </div>
           <div className="row g-4 mt-4">
@@ -168,8 +203,13 @@ export default function Explore() {
           <div className="row g-4">
             <div className="col-12 col-md-4">
               <div className="role-card">
-                <div className="role-image-placeholder">
-                  <span>Citizens Image</span>
+                <div className="role-image-placeholder image-filled">
+                  <img
+                    src={roleImages.citizens}
+                    alt="Citizens using the platform"
+                    className="explore-page-image"
+                    loading="lazy"
+                  />
                 </div>
                 <h5>Citizens</h5>
                 <p>Request pickups, track status, and see your recycling impact with easy-to-use dashboards.</p>
@@ -177,8 +217,13 @@ export default function Explore() {
             </div>
             <div className="col-12 col-md-4">
               <div className="role-card">
-                <div className="role-image-placeholder">
-                  <span>Agents Image</span>
+                <div className="role-image-placeholder image-filled">
+                  <img
+                    src={roleImages.agents}
+                    alt="Collection agents coordinating pickups"
+                    className="explore-page-image"
+                    loading="lazy"
+                  />
                 </div>
                 <h5>Collection Agents</h5>
                 <p>Manage assigned pickups, update collection status, and optimize routes efficiently.</p>
@@ -186,8 +231,13 @@ export default function Explore() {
             </div>
             <div className="col-12 col-md-4">
               <div className="role-card">
-                <div className="role-image-placeholder">
-                  <span>Recyclers Image</span>
+                <div className="role-image-placeholder image-filled">
+                  <img
+                    src={roleImages.recyclers}
+                    alt="Recyclers processing e-waste"
+                    className="explore-page-image"
+                    loading="lazy"
+                  />
                 </div>
                 <h5>Recyclers</h5>
                 <p>Process incoming e-waste, manage inventory, and generate compliance reports.</p>
