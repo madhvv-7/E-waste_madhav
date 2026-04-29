@@ -706,7 +706,7 @@ function AdminDashboard() {
                               <td>{new Date(account.createdAt).toLocaleString()}</td>
                               <td>
                                 <button onClick={() => handleApproveAccount(account._id)} className="btn btn-success btn-sm me-2" disabled={approving === account._id || rejecting === account._id}>{approving === account._id ? 'Approving...' : 'Approve'}</button>
-                                <button onClick={() => handleRejectAccount(account._1d)} className="btn btn-warning btn-sm" disabled={approving === account._id || rejecting === account._id}>{rejecting === account._id ? 'Rejecting...' : 'Reject'}</button>
+                                <button onClick={() => handleRejectAccount(account._id)} className="btn btn-warning btn-sm" disabled={approving === account._id || rejecting === account._id}>{rejecting === account._id ? 'Rejecting...' : 'Reject'}</button>
                               </td>
                             </tr>
                           ))}
